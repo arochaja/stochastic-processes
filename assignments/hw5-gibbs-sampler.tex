@@ -500,7 +500,7 @@ colnames(x) <- colnames(diabetes$x)
 # Bayesian lasso: MH-within-Gibbs skeleton
 #   y | beta, sig2 ~ N(x beta, sig2 I)
 #   beta_j iid ~ Laplace(0, lambda) with f(b) = (lambda/2) exp{-lambda |b|}
-#   sig2 follows Inv-Gamma(a, b) with density ∝ (sig2)^-(a+1) exp{-b/sig2}
+#   sig2 follows Inv-Gamma(a, b) with density proportional to (sig2)^-(a+1) exp{-b/sig2}
 #
 # Gibbs:  sig2 | beta, y is conjugate
 # MH:     beta_j | beta_-j, sig2, y
