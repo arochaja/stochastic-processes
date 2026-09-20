@@ -9,13 +9,14 @@
 \usepackage{fancyhdr}
 \usepackage{tocloft} % Add this package
 \usepackage{xcolor}
+\definecolor{darkgreen}{RGB}{0,100,0}
 \usepackage{listings}
 \lstset{
   language=R,
   basicstyle=\ttfamily\small,
   keywordstyle=\color{red},
-  commentstyle=\color{green},
-  stringstyle=\color{green},
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{darkgreen},
   numbers=left,
   numberstyle=\tiny,
   stepnumber=1,
@@ -73,7 +74,7 @@ transition matrix and find the stationary distribution.
 
 \smallskip
 
-\noindent \textcolor{green}{
+\noindent \textcolor{darkgreen}{
 \textbf{Stationary Distribution.}
 Let $X_0, X_1, \ldots$ be a Markov chain with transition matrix $P$.
 A \emph{stationary distribution} is a probability distribution $\pi$
@@ -192,7 +193,7 @@ P_1 & 0 \\
 \item Does the Markov chain have a limiting distribution? If so, find it.
 \end{enumerate}
 
-{\color{green}
+{\color{darkgreen}
 \noindent \textbf{Limiting Distribution.}
 
 \noindent Let $X_0, X_1, \ldots$ be a Markov chain with transition matrix $P$.
@@ -205,7 +206,7 @@ $\lambda$ with the property that, for all $i$ and $j$,
 
 \medskip
 
-{\color{green}
+{\color{darkgreen}
 \noindent \textbf{Limiting Distributions are Stationary Distributions.}
 
 \noindent Assume that $\pi$ is the limiting distribution of a Markov chain with
@@ -214,7 +215,7 @@ transition matrix $P$. Then $\pi$ is a stationary distribution.
 
 \medskip
 
-{\color{green}
+{\color{darkgreen}
 \noindent \textbf{Positive Matrices and Vectors.}
 
 \noindent A matrix $M$ is said to be \emph{positive} if all entries of $M$ are positive.
@@ -230,7 +231,7 @@ nonnegativity and does not refer to positive definiteness.
 
 \medskip
 
-{\color{green}
+{\color{darkgreen}
 \noindent \textbf{Regular Transition Matrix.}
 
 \noindent A transition matrix $P$ is said to be \emph{regular} if some power of $P$
@@ -242,7 +243,7 @@ P^n > 0 \quad \text{for some } n \ge 1.
 
 \medskip
 
-{\color{green}
+{\color{darkgreen}
 \noindent \textbf{Limit Theorem for Regular Markov Chains.}
 
 \noindent Let $X_0, X_1, \ldots$ be a Markov chain whose transition matrix $P$ is regular.

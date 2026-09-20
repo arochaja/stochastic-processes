@@ -9,13 +9,14 @@
 \usepackage{fancyhdr}
 \usepackage{tocloft} % Add this package
 \usepackage{xcolor}
+\definecolor{darkgreen}{RGB}{0,100,0}
 \usepackage{listings}
 \lstset{
   language=R,
   basicstyle=\ttfamily\small,
   keywordstyle=\color{red},
-  commentstyle=\color{green},
-  stringstyle=\color{green},
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{darkgreen},
   numbers=left,
   numberstyle=\tiny,
   stepnumber=1,
@@ -86,7 +87,7 @@ P =
 
 \smallskip
 
-{\color{green}
+{\color{darkgreen}
 
 \noindent \textbf{Accessible}
 
@@ -94,14 +95,14 @@ P =
 That is, there is positive probability of reaching $j$ from $i$ in a finite number of steps.
 }
 
-{\noindent \color{green}
+{\noindent \color{darkgreen}
 
 \noindent \textbf{Communicate}
 
 \noindent States $i$ and $j$ \emph{communicate} if $i$ is accessible from $j$ and $j$ is accessible from $i$.
 }
 
-{\noindent \color{green}
+{\noindent \color{darkgreen}
 
 \noindent \textbf{Communication Class}
 
@@ -110,7 +111,7 @@ That is, there is positive probability of reaching $j$ from $i$ in a finite numb
 
 \medskip
 
-{\noindent \color{green}
+{\noindent \color{darkgreen}
 \textbf{Irreducibility}
 
 \noindent A Markov chain is called \emph{irreducible} if it has exactly one communication class. 
@@ -119,7 +120,7 @@ That is, all states communicate with each other.
 
 \medskip
 
-{\noindent \color{green}
+{\noindent \color{darkgreen}
 \textbf{Ergodic Markov Chain}
 
 \noindent A Markov chain is called \emph{ergodic} if it is irreducible, aperiodic, and all states have finite expected return times. 
@@ -129,7 +130,7 @@ Thus, a finite Markov chain is ergodic if and only if it is irreducible and aper
 
 \medskip
 
-{\color{green}
+{\color{darkgreen}
 
 \noindent \textbf{Ergodic Chains and Regular Matrices}
 
@@ -139,7 +140,7 @@ The Markov chain is ergodic if and only if $P$ is regular.
 
 \medskip
 
-{\noindent \color{green}
+{\noindent \color{darkgreen}
 \textbf{Fundamental Limit Theorem for Ergodic Markov Chains}
 
 \noindent Let $X_0, X_1, \dots$ be an ergodic Markov chain. There exists a unique, positive, stationary distribution $\pi$, which is the limiting distribution of the chain. That is,
@@ -266,27 +267,27 @@ Identify the communication classes. Classify the states as recurrent or transien
 
 \smallskip
 
-\noindent \textcolor{green}{
+\noindent \textcolor{darkgreen}{
 \noindent \textbf{Recurrent and Transient States}
 }
 
-\noindent \textcolor{green}{
+\noindent \textcolor{darkgreen}{
 State $j$ is said to be \emph{recurrent} if the Markov chain started in $j$
 eventually revisits $j$. That is, $f_j = 1$.
 }
 
-\noindent \textcolor{green}{
+\noindent \textcolor{darkgreen}{
 State $j$ is said to be \emph{transient} if there is positive probability that
 the Markov chain started in $j$ never returns to $j$. That is, $f_j < 1$.
 }
 
 \medskip
 
-{\noindent \color{green}
+{\noindent \color{darkgreen}
 \textbf{Recurrence, Transience}
 }
 
-{\color{green}
+{\color{darkgreen}
 \begin{enumerate}
 \item[(i)] State $j$ is recurrent if and only if
 \[
@@ -300,22 +301,22 @@ the Markov chain started in $j$ never returns to $j$. That is, $f_j < 1$.
 \end{enumerate}
 }
 
-{\noindent \color{green}
+{\noindent \color{darkgreen}
 \textbf{Recurrence and Transience are Class Properties}
 }
 
-{\noindent \color{green}
+{\noindent \color{darkgreen}
 \emph{The states of a communication class are either all recurrent
 or all transient.}
 }
 
 \medskip
 
-{\color{green}
+{\color{darkgreen}
 \noindent \textbf{Period}
 }
 
-{\color{green}
+{\color{darkgreen}
 \noindent For a Markov chain with transition matrix $P$, the \emph{period} of state $i$,
 denoted $d(i)$, is the greatest common divisor of the set of possible return
 times to $i$. That is,
@@ -324,26 +325,26 @@ d(i) = \gcd\{\, n > 0 : P^{n}_{ii} > 0 \,\}.
 \]
 }
 
-{\color{green}
+{\color{darkgreen}
 \noindent If $d(i) = 1$, state $i$ is said to be \emph{aperiodic}. If the set of return
 times is empty, set $d(i) = +\infty$.
 }
 
 \medskip
 
-{\color{green}
+{\color{darkgreen}
 \noindent \textbf{Periodicity is a Class Property}
 }
 
 \medskip
 
-{\color{green}
+{\color{darkgreen}
 \noindent \emph{The states of a communication class all have the same period.}
 }
 
 \medskip
 
-{\color{green} \noindent \textbf{Closed Communication Class}
+{\color{darkgreen} \noindent \textbf{Closed Communication Class}
 
 \noindent A communication class is \emph{closed} if it consists of all recurrent states.
 A finite communication class is \emph{closed} only if it consists of all recurrent states.

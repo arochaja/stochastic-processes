@@ -9,13 +9,14 @@
 \usepackage{fancyhdr}
 \usepackage{tocloft} % Add this package
 \usepackage{xcolor}
+\definecolor{darkgreen}{RGB}{0,100,0}
 \usepackage{listings}
 \lstset{
   language=R,
   basicstyle=\ttfamily\small,
   keywordstyle=\color{red},
-  commentstyle=\color{green},
-  stringstyle=\color{green},
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{darkgreen},
   numbers=left,
   numberstyle=\tiny,
   stepnumber=1,
@@ -83,7 +84,7 @@ with initial distribution $\alpha=(0.2,\,0.3,\,0.5)$. Find the following:
   \item[(d)] $E(X_2)$
 \end{enumerate}
 
-\noindent {\color{green} \textbf{Stochastic Process.}
+\noindent {\color{darkgreen} \textbf{Stochastic Process.}
 A \emph{stochastic process} is a collection of random variables
 $\{X_t : t \in I\}$.
 The set $I$ is called the \emph{index set} of the process.
@@ -92,7 +93,7 @@ The random variables are defined on a common \emph{state space} $S$.
 
 \medskip
 
-\noindent {\color{green} \textbf{Markov Chain.}
+\noindent {\color{darkgreen} \textbf{Markov Chain.}
 Let $S$ be a discrete set. A \emph{Markov chain} is a sequence of random variables
 $X_0, X_1, \ldots$ taking values in $S$ with the property that
 \[
@@ -115,7 +116,7 @@ P(X_{n+1} = j \mid X_n = i) = P(X_1 = j \mid X_0 = i),
 
 \medskip
 
-\noindent{\color{green} \textbf{Bayes.} Let $A_1, A_2, \ldots, A_k$ be events such that $P(A_i) > 0$, $i = 1, 2, \ldots, k$. 
+\noindent{\color{darkgreen} \textbf{Bayes.} Let $A_1, A_2, \ldots, A_k$ be events such that $P(A_i) > 0$, $i = 1, 2, \ldots, k$. 
 Assume further that $A_1, A_2, \ldots, A_k$ form a partition of the sample space $\mathcal{C}$. 
 Let $B$ be any event. Then
 \[
@@ -124,7 +125,7 @@ P(A_j \mid B) = \frac{P(A_j) P(B \mid A_j)}{\sum_{i=1}^k P(A_i) P(B \mid A_i)}, 
 }
 
 
-\noindent{\color{green} \textbf{Law of Total Probability.}
+\noindent{\color{darkgreen} \textbf{Law of Total Probability.}
 Let $A_1,A_2,\dots,A_k$ be events such that $P(A_i)>0$ for $i=1,2,\dots,k$, and assume $A_1,\dots,A_k$ form a partition of the sample space $\mathcal{C}$. 
 Then for any event $B$,
 \[
@@ -451,7 +452,7 @@ P^{n} = P,
 \qquad \text{for all } n \ge 1.
 \]
 
-\noindent{\color{green} \textbf{(Stochastic Matrix).}
+\noindent{\color{darkgreen} \textbf{(Stochastic Matrix).}
 A stochastic matrix is a square matrix \(P\) such that:
 \begin{enumerate}
   \item \(P_{ij} \ge 0\) for all \(i,j\).
