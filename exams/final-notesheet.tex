@@ -1,0 +1,959 @@
+\documentclass[10pt]{article}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{bm}
+\usepackage{titlesec}
+
+\geometry{margin=0.52in}
+\setlength{\columnsep}{0.22in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+
+\titleformat{\section}
+{\large\bfseries\color{blue}}
+{\thesection}{0.4em}{}
+
+\titleformat{\subsection}
+{\bfseries\color{teal!70!black}}
+{\thesubsection}{0.4em}{}
+
+% ---------- Color Boxes ----------
+
+\newtcolorbox{definitionbox}{
+colback=blue!5,
+colframe=blue!60!black,
+boxrule=0.8pt,
+arc=4pt,
+left=4pt,right=4pt,top=4pt,bottom=4pt
+}
+
+\newtcolorbox{theorembox}{
+colback=green!5,
+colframe=green!50!black,
+boxrule=0.8pt,
+arc=4pt,
+left=4pt,right=4pt,top=4pt,bottom=4pt
+}
+
+\newtcolorbox{formulabox}{
+colback=yellow!10,
+colframe=orange!80!black,
+boxrule=0.8pt,
+arc=4pt,
+left=4pt,right=4pt,top=4pt,bottom=4pt
+}
+
+\title{\vspace{-1cm}STAT 545 Final Exam Notesheet}
+\date{}
+
+\begin{document}
+
+\maketitle
+\vspace{-1.1cm}
+
+\begin{multicols}{2}
+
+%------------------------------------------------
+\section{Stochastic Processes}
+
+\begin{definitionbox}
+\textbf{Stochastic Process}
+
+A stochastic process is a collection of random variables
+\[
+\{X_t : t \in I\}
+\]
+where \(I\) is the index set (usually time) and \(S\) is the state space.
+\end{definitionbox}
+
+%------------------------------------------------
+\section{Markov Chains}
+
+\begin{definitionbox}
+\textbf{Markov Property}
+\[
+P(X_{n+1}=j \mid X_0,\dots,X_n=i)
+=
+P(X_{n+1}=j \mid X_n=i)
+\]
+\end{definitionbox}
+
+\subsection{Transition Matrix}
+
+\begin{formulabox}
+\[
+P_{ij} = P(X_{n+1}=j \mid X_n=i)
+\]
+\[
+P =
+\begin{pmatrix}
+p_{11} & p_{12} & \dots \\
+p_{21} & p_{22} & \dots \\
+\vdots & \vdots & \ddots
+\end{pmatrix}
+\]
+\end{formulabox}
+
+Properties:
+\begin{itemize}[leftmargin=12pt,itemsep=1pt]
+\item \(p_{ij}\ge 0\)
+\item \(\sum_j p_{ij}=1\)
+\end{itemize}
+
+\subsection{Time Homogeneous}
+
+\[
+P(X_{n+1}=j \mid X_n=i)=P(X_1=j \mid X_0=i)
+\]
+
+%------------------------------------------------
+\section{\(n\)-Step Transition Probabilities}
+
+\begin{formulabox}
+\[
+P_{ij}^{(n)} = P(X_n=j \mid X_0=i)
+\]
+\[
+P^{(n)} = P^n
+\]
+\end{formulabox}
+
+\begin{theorembox}
+\textbf{Chapman--Kolmogorov}
+\[
+P_{ij}^{(m+n)}
+=
+\sum_k P_{ik}^{(m)}P_{kj}^{(n)}
+\]
+\end{theorembox}
+
+%------------------------------------------------
+\section{Distribution Evolution}
+
+\begin{formulabox}
+If initial distribution is
+\[
+\alpha = (\alpha_1,\dots,\alpha_k)
+\]
+then
+\[
+P(X_n=\cdot)=\alpha P^n
+\]
+\end{formulabox}
+
+%------------------------------------------------
+\section{Stationary Distributions}
+
+\begin{definitionbox}
+\[
+\pi=\pi P
+\]
+\[
+\pi_j=\sum_i \pi_i P_{ij}
+\]
+with
+\[
+\sum_i \pi_i=1
+\]
+\end{definitionbox}
+
+%------------------------------------------------
+\section{Regular / Ergodic Chains}
+
+\begin{definitionbox}
+A matrix \(P\) is \textbf{regular} if
+\[
+P^n>0
+\]
+for some \(n\).
+\end{definitionbox}
+
+\begin{theorembox}
+If \(P\) is regular:
+\begin{itemize}[leftmargin=12pt,itemsep=1pt]
+\item unique stationary distribution
+\item limiting distribution exists
+\item rows of \(P^n\) converge to \(\pi\)
+\end{itemize}
+\end{theorembox}
+
+\begin{theorembox}
+Finite chain is \textbf{ergodic} if
+\begin{itemize}[leftmargin=12pt,itemsep=1pt]
+\item irreducible
+\item aperiodic
+\end{itemize}
+Then
+\[
+P_{ij}^{(n)}\to \pi_j
+\]
+\end{theorembox}
+
+%------------------------------------------------
+\section{Communication, Recurrence, Period}
+
+\begin{definitionbox}
+State \(j\) is accessible from \(i\) if
+\[
+P_{ij}^{(n)}>0
+\]
+for some \(n\ge 1\).
+\end{definitionbox}
+
+Communicating: accessible both ways.
+
+Irreducible: all states communicate.
+
+\begin{definitionbox}
+State \(j\) is recurrent if
+\[
+P(\text{return to }j)=1
+\]
+Equivalent:
+\[
+\sum_{n=0}^\infty P_{jj}^{(n)}=\infty
+\]
+Transient if
+\[
+\sum_{n=0}^\infty P_{jj}^{(n)}<\infty
+\]
+\end{definitionbox}
+
+\begin{formulabox}
+\[
+d(i)=\gcd\{n>0 : P_{ii}^{(n)}>0\}
+\]
+Aperiodic if \(d(i)=1\).
+\end{formulabox}
+
+%------------------------------------------------
+\section{Detailed Balance / Reversibility}
+
+\begin{formulabox}
+\[
+\pi(i)P(i,j)=\pi(j)P(j,i)
+\]
+\end{formulabox}
+
+Detailed balance \(\Rightarrow\) \(\pi\) stationary.
+
+Reversible chain \(\iff\) detailed balance holds for some \(\pi\).
+
+%------------------------------------------------
+\section{Birth--Death Chains}
+
+\[
+P(i,i+1)=p_i,\qquad P(i,i-1)=q_i
+\]
+
+\begin{formulabox}
+\[
+\frac{\pi(i+1)}{\pi(i)}=\frac{p_i}{q_{i+1}}
+\]
+\end{formulabox}
+
+%------------------------------------------------
+\section{Reflecting Random Walks}
+
+Interior transitions:
+\[
+P(i,i+1)=p,\qquad P(i,i-1)=1-p
+\]
+
+Typical reflecting boundaries:
+\[
+P(0,1)=1,\qquad P(n,n-1)=1
+\]
+
+\begin{formulabox}
+Let
+\[
+r=\frac{p}{1-p}
+\]
+Then from detailed balance,
+\[
+\pi(i+1)=r\,\pi(i)
+\]
+up to boundary adjustments / normalization.
+\end{formulabox}
+
+For finite path with no self-loops: usually irreducible, period \(2\).
+
+%------------------------------------------------
+\section{Mean Return Time}
+
+\begin{formulabox}
+For positive recurrent state \(i\),
+\[
+E[T_i]=\frac{1}{\pi(i)}
+\]
+\end{formulabox}
+
+Long-run fraction of time in state \(i\) is \(\pi(i)\).
+
+%------------------------------------------------
+\section{Hitting Times / Hitting Probabilities}
+
+\begin{definitionbox}
+For set \(A\),
+\[
+\tau_A=\inf\{t\ge 0: X_t\in A\}
+\]
+For a single state \(j\),
+\[
+\tau_j=\inf\{t\ge 0: X_t=j\}
+\]
+\end{definitionbox}
+
+\begin{formulabox}
+Hitting probability:
+\[
+h_i=P_i(\tau_A<\infty)
+\]
+satisfies
+\[
+h_i=\sum_j P_{ij}h_j
+\]
+for \(i\notin A\), with boundary
+\[
+h_i=1,\quad i\in A
+\]
+\end{formulabox}
+
+\begin{formulabox}
+Expected hitting time:
+\[
+m_i=E_i[\tau_A]
+\]
+satisfies
+\[
+m_i=1+\sum_j P_{ij}m_j
+\]
+for \(i\notin A\), with
+\[
+m_i=0,\quad i\in A
+\]
+\end{formulabox}
+
+Try exponential form \(h_i=\lambda^i\) for nearest-neighbor walks.
+
+%------------------------------------------------
+\section{Recurrence Classification on \(\mathbb{N}\)}
+
+For reflecting walk on \(\mathbb{N}\) with interior moves
+\[
+P(i,i+1)=p,\qquad P(i,i-1)=1-p,\qquad P(0,1)=1
+\]
+
+\begin{formulabox}
+\[
+r=\frac{p}{1-p}
+\]
+\[
+p<\frac12 \Rightarrow \text{positive recurrent}
+\]
+\[
+p=\frac12 \Rightarrow \text{null recurrent}
+\]
+\[
+p>\frac12 \Rightarrow \text{transient}
+\]
+\end{formulabox}
+
+Characteristic equation for return probs:
+\[
+p\lambda^2-\lambda+(1-p)=0
+\]
+
+%------------------------------------------------
+\section{Two-State Markov Chains}
+
+\[
+P=
+\begin{pmatrix}
+1-p & p\\
+q & 1-q
+\end{pmatrix}
+\qquad
+\alpha=(\alpha_0,\alpha_1)
+\]
+
+\subsection{Two-Step Transition}
+
+\begin{formulabox}
+\[
+P^2=
+\begin{pmatrix}
+(1-p)^2+pq & p(2-p-q)\\
+q(2-p-q) & (1-q)^2+pq
+\end{pmatrix}
+\]
+\end{formulabox}
+
+\subsection{Expectation of the State}
+
+Since \(X_n\in\{0,1\}\),
+\[
+E[X_n]=P(X_n=1)
+\]
+\[
+E[X_2]=(\alpha P^2)_1
+\]
+
+\subsection{Closed Form for \(P^n\)}
+
+\begin{formulabox}
+\[
+P^n=
+\frac{1}{p+q}
+\begin{pmatrix}
+q+p(1-p-q)^n & p-p(1-p-q)^n\\
+q-q(1-p-q)^n & p+q(1-p-q)^n
+\end{pmatrix}
+\]
+\end{formulabox}
+
+\[
+\pi=
+\left(\frac{q}{p+q},\frac{p}{p+q}\right)
+\]
+
+\[
+\lim_{n\to\infty}P^n=
+\begin{pmatrix}
+\pi_0 & \pi_1\\
+\pi_0 & \pi_1
+\end{pmatrix}
+\]
+
+\begin{formulabox}
+\[
+E[X_n]
+=
+\frac{p}{p+q}
++
+\left(\alpha_1-\frac{p}{p+q}\right)(1-p-q)^n
+\]
+\end{formulabox}
+
+%------------------------------------------------
+\section{Random Walks on Graphs}
+
+\begin{definitionbox}
+A random walk on a graph moves uniformly to a neighboring vertex.
+\end{definitionbox}
+
+\[
+P_{ij}=
+\frac{1}{\deg(i)}
+\quad \text{if } i\sim j
+\]
+
+Key steps:
+\begin{enumerate}[leftmargin=14pt,itemsep=1pt]
+\item Compute degree of each vertex.
+\item Normalize each row by degree.
+\end{enumerate}
+
+\begin{formulabox}
+Stationary distribution for simple random walk on undirected graph:
+\[
+\pi(i)=\frac{\deg(i)}{\sum_j \deg(j)}
+\]
+\end{formulabox}
+
+\subsection{Period in Graph Walks}
+
+\begin{formulabox}
+\[
+d(i)=\gcd\{n\ge 1 : P_{ii}^{(n)}>0\}
+\]
+\end{formulabox}
+
+Facts:
+\begin{itemize}[leftmargin=12pt,itemsep=1pt]
+\item bipartite graph \(\Rightarrow\) period \(2\)
+\item self-loop often makes chain aperiodic
+\end{itemize}
+
+%------------------------------------------------
+\section{Absorbing Markov Chains}
+
+\begin{definitionbox}
+A state is absorbing if
+\[
+P_{ii}=1
+\]
+\end{definitionbox}
+
+Reorder states so
+\[
+P=
+\begin{pmatrix}
+Q & R\\
+0 & S
+\end{pmatrix}
+\]
+where \(Q\): transient \(\to\) transient, \(R\): transient \(\to\) closed/absorbing.
+
+\subsection{Fundamental Matrix}
+
+\begin{theorembox}
+\[
+F=(I-Q)^{-1}
+\]
+\end{theorembox}
+
+Interpretation:
+\[
+F_{ij}=\text{expected visits to transient state }j\text{ starting from }i
+\]
+
+\subsection{Expected Time to Absorption}
+
+\begin{formulabox}
+\[
+E[T\mid X_0=i]=\sum_j F_{ij}
+\]
+\end{formulabox}
+
+\subsection{Absorption Probabilities}
+
+\begin{formulabox}
+\[
+B=FR
+\]
+\end{formulabox}
+
+\(B_{ij}\): probability of eventual absorption in closed/absorbing state \(j\).
+
+\subsection{Limiting Matrix}
+
+\begin{theorembox}
+If closed classes are aperiodic,
+\[
+\lim_{n\to\infty}P^n=
+\begin{pmatrix}
+0 & (I-Q)^{-1}R\Pi\\
+0 & \Pi
+\end{pmatrix}
+\]
+\end{theorembox}
+
+\(\Pi\): stationary distributions of closed classes.
+
+%------------------------------------------------
+\section{Estimating Transition Matrices}
+
+Suppose transition counts \(N_{ij}\) are observed.
+
+\subsection{MLE}
+
+\begin{formulabox}
+\[
+\hat P_{ij}=
+\frac{N_{ij}}{\sum_j N_{ij}}
+\]
+\end{formulabox}
+
+(row-normalized counts)
+
+\subsection{Laplace Smoothing}
+
+\begin{formulabox}
+\[
+\hat p_i=
+\frac{N_i+1}{\sum_j (N_j+1)}
+\]
+\end{formulabox}
+
+Prevents zero probabilities.
+
+\subsection{Dirichlet Smoothing}
+
+Prior:
+\[
+p\sim Dir(\alpha\mu)
+\]
+
+Posterior mean:
+\begin{formulabox}
+\[
+\tilde p_i=
+\frac{N_i+\alpha\mu_i}{N+\alpha}
+\]
+\end{formulabox}
+
+%------------------------------------------------
+\section{Poisson Process}
+
+\begin{definitionbox}
+For homogeneous Poisson process \((N(t))\):
+\begin{itemize}[leftmargin=12pt,itemsep=1pt]
+\item \(N(0)=0\)
+\item independent increments
+\item stationary increments
+\item \(N(t)\sim \text{Poisson}(\lambda t)\)
+\end{itemize}
+\end{definitionbox}
+
+\begin{formulabox}
+\[
+P(N(t)=k)=e^{-\lambda t}\frac{(\lambda t)^k}{k!}
+\]
+\[
+E[N(t)]=\lambda t,\qquad Var(N(t))=\lambda t
+\]
+\end{formulabox}
+
+\subsection{MLE for Poisson Rate}
+
+\begin{formulabox}
+\[
+\hat\lambda=\frac{N(T)}{T}
+\]
+\end{formulabox}
+
+\subsection{Exponential Waiting Times}
+
+\[
+T_1\sim Exp(\lambda)
+\]
+\[
+P(T_1>t)=e^{-\lambda t}
+\]
+\[
+E[T_1]=\frac{1}{\lambda}
+\]
+
+If waiting for \(m\) additional arrivals,
+\[
+E[\text{wait time}]=\frac{m}{\lambda}
+\]
+
+\subsection{Thinning}
+
+If each event is observed independently with probability \(q\),
+\[
+\lambda_{\text{obs}}=q\lambda,\qquad \lambda=\frac{\lambda_{\text{obs}}}{q}
+\]
+
+%------------------------------------------------
+\section{Nonhomogeneous Poisson Process}
+
+Intensity \(\lambda(t)\) varies with time.
+
+\begin{formulabox}
+\[
+E[N(b)-N(a)]=\int_a^b \lambda(t)\,dt
+\]
+\[
+N(b)-N(a)\sim \text{Poisson}\!\left(\int_a^b \lambda(t)\,dt\right)
+\]
+\end{formulabox}
+
+Probability of no arrivals on \([0,t]\):
+\[
+P(N(t)=0)=\exp\left(-\int_0^t \lambda(s)\,ds\right)
+\]
+
+First arrival survival:
+\[
+P(T_1>t)=\exp\left(-\int_0^t \lambda(s)\,ds\right)
+\]
+
+%------------------------------------------------
+\section{Brownian Motion}
+
+\begin{definitionbox}
+Standard Brownian motion \((B_t)\):
+\begin{itemize}[leftmargin=12pt,itemsep=1pt]
+\item \(B_0=0\)
+\item independent increments
+\item \(B_t-B_s\sim N(0,t-s)\) for \(t>s\)
+\end{itemize}
+\end{definitionbox}
+
+\[
+E[B_t]=0,\qquad Var(B_t)=t
+\]
+\[
+Cov(B_s,B_t)=\min(s,t)
+\]
+
+%------------------------------------------------
+\section{Brownian Motion with Drift}
+
+\begin{formulabox}
+\[
+X_t=\mu t+\sigma B_t
+\]
+\[
+E[X_t]=\mu t,\qquad Var(X_t)=\sigma^2 t
+\]
+\end{formulabox}
+
+If observed at equal spacing \(\Delta t\),
+\[
+\hat\mu=\frac{1}{n\Delta t}\sum_{k=1}^n (X_{t_k}-X_{t_{k-1}})
+\]
+
+For 2D:
+\[
+Z_t=\mu t+\Sigma^{1/2}B_t,
+\qquad
+\hat\mu=\frac{Z_{t_n}-Z_{t_0}}{t_n-t_0}
+\]
+
+%------------------------------------------------
+\section{Brownian Bridge}
+
+\begin{definitionbox}
+Standard Brownian bridge:
+\[
+W_t=B_t-tB_1,\qquad 0\le t\le 1
+\]
+Equivalent in distribution to \((B_t\mid B_1=0)\).
+\end{definitionbox}
+
+\[
+E[W_t]=0
+\]
+\[
+Cov(W_s,W_t)=\min(s,t)-st
+\]
+
+For \(X_t=\mu t+\sigma B_t\),
+\[
+(X_t\mid X_1=0)\overset{d}= \sigma(B_t-tB_1)
+\]
+with covariance
+\[
+\sigma^2(\min(s,t)-st)
+\]
+
+%------------------------------------------------
+\section{Conditional Normal}
+
+\begin{formulabox}
+If \((X,Y)\) is jointly normal, then
+\[
+X\mid Y=y \sim
+N\left(
+\mu_x+\frac{\sigma_{xy}}{\sigma_y^2}(y-\mu_y),
+\;
+\sigma_x^2-\frac{\sigma_{xy}^2}{\sigma_y^2}
+\right)
+\]
+\end{formulabox}
+
+Useful with Brownian motion:
+\[
+(B_t,B_1)\sim N\!\left(
+\begin{pmatrix}0\\0\end{pmatrix},
+\begin{pmatrix}t&t\\ t&1\end{pmatrix}
+\right)
+\]
+
+%------------------------------------------------
+\section{Random Walk Drift in 2D}
+
+For steps \(E,W,N,S\) with probabilities \(p_E,p_W,p_N,p_S\),
+
+\begin{formulabox}
+\[
+E[\Delta Z]=(p_E-p_W,\; p_N-p_S)
+\]
+\end{formulabox}
+
+If counts are \(N_E,N_W,N_N,N_S\) over \(n\) steps,
+\[
+\hat p_E=\frac{N_E}{n},\quad
+\hat p_W=\frac{N_W}{n},\quad
+\hat p_N=\frac{N_N}{n},\quad
+\hat p_S=\frac{N_S}{n}
+\]
+
+\[
+\hat\delta=
+\left(
+\frac{N_E-N_W}{n},
+\frac{N_N-N_S}{n}
+\right)
+\]
+
+Sample mean increment:
+\[
+\bar\Delta=\frac1n\sum_{k=1}^n (Z_k-Z_{k-1})
+\]
+
+If each step lasts \(\Delta t\),
+\[
+\hat\mu=\frac{\hat\delta}{\Delta t}
+\]
+
+%------------------------------------------------
+\section{Bayesian Logistic Regression}
+
+Model:
+\[
+P(Y_i=1\mid \beta)=\frac{e^{\beta x_i}}{1+e^{\beta x_i}},
+\qquad
+\beta\sim N(0,\tau^2)
+\]
+
+\begin{formulabox}
+Posterior kernel:
+\[
+p(\beta\mid y,x)\propto
+\left[
+\prod_{i=1}^n
+\frac{e^{y_i\beta x_i}}{1+e^{\beta x_i}}
+\right]
+\exp\left(-\frac{\beta^2}{2\tau^2}\right)
+\]
+\end{formulabox}
+
+Odds ratio for one-unit increase in \(x\):
+\[
+e^\beta
+\]
+
+Approx.\ MAP = maximizer of log-posterior.
+
+Exponentiate posterior quantiles of \(\beta\) to get credible interval for \(e^\beta\).
+
+%------------------------------------------------
+\section{Metropolis--Hastings}
+
+Target density \(\pi(\theta)\), proposal \(q(\theta^\star\mid \theta)\).
+
+\begin{formulabox}
+Acceptance probability:
+\[
+\alpha(\theta,\theta^\star)=
+\min\left\{
+1,\,
+\frac{\pi(\theta^\star)\,q(\theta\mid\theta^\star)}
+{\pi(\theta)\,q(\theta^\star\mid\theta)}
+\right\}
+\]
+\end{formulabox}
+
+If proposal symmetric (\(q(\theta^\star\mid\theta)=q(\theta\mid\theta^\star)\)):
+\[
+\alpha(\theta,\theta^\star)=
+\min\left\{1,\frac{\pi(\theta^\star)}{\pi(\theta)}\right\}
+\]
+
+Random-walk proposal:
+\[
+\theta^\star\sim N(\theta,s^2)
+\]
+
+Rule of thumb: moderate acceptance rate is usually good.
+
+%------------------------------------------------
+\section{Gaussian Mixture Model}
+
+Latent variable form:
+\[
+z_i\mid \pi \sim Bernoulli(\pi),
+\qquad
+y_i\mid z_i,\mu_0,\mu_1,\sigma^2 \sim N(\mu_{z_i},\sigma^2)
+\]
+
+Priors:
+\[
+\pi\sim Beta(a,b),\quad
+\mu_k\sim N(m_k,s_k^2),\quad
+\sigma^2\sim Inv\text{-}Gamma(\alpha,\beta)
+\]
+
+\subsection{Full Conditional for \(z_i\)}
+
+\begin{formulabox}
+\[
+P(z_i=1\mid \cdot)=
+\frac{\pi\,\phi(y_i;\mu_1,\sigma^2)}
+{(1-\pi)\phi(y_i;\mu_0,\sigma^2)+\pi\phi(y_i;\mu_1,\sigma^2)}
+\]
+\end{formulabox}
+
+\subsection{Full Conditional for \(\pi\)}
+
+If \(n_1=\sum_i z_i\), \(n_0=n-n_1\),
+\[
+\pi\mid z \sim Beta(a+n_1,b+n_0)
+\]
+
+\subsection{Full Conditional for \(\mu_k\)}
+
+For \(k\in\{0,1\}\), let \(n_k=|\{i:z_i=k\}|\), \(\bar y_k\) sample mean in cluster \(k\).
+
+\begin{formulabox}
+\[
+(\,s_k^\star\,)^{-2}=s_k^{-2}+\frac{n_k}{\sigma^2}
+\]
+\[
+m_k^\star=(s_k^\star)^2
+\left(
+\frac{m_k}{s_k^2}+\frac{n_k\bar y_k}{\sigma^2}
+\right)
+\]
+\[
+\mu_k\mid \cdot \sim N(m_k^\star,(s_k^\star)^2)
+\]
+\end{formulabox}
+
+\subsection{Full Conditional for \(\sigma^2\)}
+
+Let
+\[
+SSE=\sum_{i=1}^n (y_i-\mu_{z_i})^2
+\]
+
+\begin{formulabox}
+\[
+\sigma^2\mid \cdot \sim Inv\text{-}Gamma\left(\alpha+\frac n2,\; \beta+\frac{SSE}{2}\right)
+\]
+\end{formulabox}
+
+\subsection{One Gibbs Sweep}
+
+Update in order:
+\begin{enumerate}[leftmargin=14pt,itemsep=1pt]
+\item all \(z_i\)
+\item \(\pi\)
+\item \(\mu_0\)
+\item \(\mu_1\)
+\item \(\sigma^2\)
+\end{enumerate}
+
+%------------------------------------------------
+\section{Fast Problem-Solving Checklist}
+
+\begin{theorembox}
+\textbf{Common moves on exams}
+\begin{itemize}[leftmargin=12pt,itemsep=1pt]
+\item Stationary dist.: solve \(\pi P=\pi\) or use detailed balance.
+\item Long-run fraction of time in state \(i\): use \(\pi(i)\).
+\item Mean return time: use \(1/\pi(i)\).
+\item Hitting probs.: write recursion + boundary conditions.
+\item Expected hitting time: write \(m_i=1+\sum_j P_{ij}m_j\).
+\item Absorbing chain: compute \(F=(I-Q)^{-1}\), then \(FR\).
+\item Poisson counts: integrate \(\lambda(t)\).
+\item Brownian drift MLE: net displacement / total time.
+\item MH: posterior ratio \(\times\) proposal ratio.
+\item Gibbs: identify full conditional families.
+\end{itemize}
+\end{theorembox}
+
+\end{multicols}
+
+\end{document}

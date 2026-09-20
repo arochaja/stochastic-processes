@@ -1,0 +1,2362 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{bm}
+\geometry{margin=1in}
+
+\title{STAT 545 -- Final Exam Practice \\ Expanded, Beginner-Friendly Solutions}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent
+\textbf{How to read this packet.}  
+These solutions are written for someone who is still learning the ideas.  
+So in many places I do three things:
+\begin{itemize}[leftmargin=1.5em]
+    \item explain \emph{what} theorem or idea is being used,
+    \item explain \emph{why} it applies here,
+    \item then carry out the algebra carefully step by step.
+\end{itemize}
+
+\hrule
+\vspace{1em}
+
+\section*{Problem 1}
+
+Let $(X_t)$ be a Markov chain on the finite state space
+\[
+S=\{0,1,\dots,n\}
+\]
+with reflecting boundaries and interior transition probabilities
+\[
+P(i,i+1)=p, \qquad P(i,i-1)=1-p, \qquad 1\le i\le n-1,
+\]
+where $0<p<1$. At the boundaries we have
+\[
+P(0,1)=1, \qquad P(n,n-1)=1.
+\]
+
+\bigskip
+
+This chain moves along the line of states
+\[
+0,1,2,\dots,n.
+\]
+If the chain is in the middle, it can move one step right or one step left.
+At the endpoints it is forced back inward.
+
+\subsection*{(a) Communicating classes and period}
+
+\paragraph{Step 1: Find the communicating classes.}
+
+A \textbf{communicating class} is a collection of states that can all reach one another.
+
+Here the transition picture is
+\[
+0 \leftrightarrow 1 \leftrightarrow 2 \leftrightarrow \cdots \leftrightarrow n.
+\]
+
+Why do we have arrows in both directions between neighboring states?
+Because for every interior state $i$,
+\[
+P(i,i+1)=p>0
+\quad \text{and} \quad
+P(i,i-1)=1-p>0.
+\]
+So if two states are neighbors, each can move directly to the other with positive probability.
+
+Now take any two states $a,b\in S$.
+To get from $a$ to $b$, we can move one step at a time along the line.
+Since each needed step has positive probability, there is a positive-probability path from $a$ to $b$.
+The same is true from $b$ back to $a$.
+
+Therefore every state communicates with every other state, so the chain is \textbf{irreducible}.
+
+Hence there is exactly \textbf{one communicating class}, namely
+\[
+S=\{0,1,\dots,n\}.
+\]
+
+\paragraph{Step 2: Find the period.}
+
+The \textbf{period} of a state $i$ is
+\[
+d(i)=\gcd\{t\ge 1 : P^t(i,i)>0\}.
+\]
+This means: look at all possible return times to state $i$, then take their greatest common divisor.
+
+Notice that every move changes the state by exactly $\pm 1$.
+So every step changes parity:
+\begin{itemize}[leftmargin=1.5em]
+    \item even state $\to$ odd state,
+    \item odd state $\to$ even state.
+\end{itemize}
+
+That means:
+\begin{itemize}[leftmargin=1.5em]
+    \item after an odd number of steps, you must be at opposite parity from where you started,
+    \item so you \emph{cannot} return to the same state in an odd number of steps.
+\end{itemize}
+
+But you \emph{can} return in two steps. For example:
+\[
+i \to i+1 \to i
+\qquad \text{or} \qquad
+i \to i-1 \to i.
+\]
+At the endpoints,
+\[
+0\to 1\to 0
+\qquad \text{and} \qquad
+n\to n-1\to n
+\]
+also both happen with positive probability.
+
+So all return times are even, and $2$ is one of them.
+Therefore
+\[
+d(i)=2 \qquad \text{for every } i\in S.
+\]
+
+\bigskip
+\noindent
+\textbf{Conclusion:}
+\[
+\text{one communicating class } S, \qquad \text{period } 2.
+\]
+
+\subsection*{(b) Stationary distribution}
+
+A \textbf{stationary distribution} is a probability distribution $\pi$ satisfying
+\[
+\pi P=\pi.
+\]
+This means that if the chain starts in distribution $\pi$, then one step later it still has distribution $\pi$.
+
+Because the chain is finite and irreducible, we know from standard Markov chain theory that a unique stationary distribution exists.
+
+\paragraph{Step 1: Use detailed balance.}
+
+For birth-death chains like this, the easiest method is often the \textbf{detailed balance equations}
+\[
+\pi(i)P(i,j)=\pi(j)P(j,i).
+\]
+These say that, in equilibrium, the probability flow from $i$ to $j$ matches the flow from $j$ to $i$.
+
+For neighboring interior states $i$ and $i+1$,
+\[
+\pi(i)P(i,i+1)=\pi(i+1)P(i+1,i).
+\]
+Substitute the transition probabilities:
+\[
+\pi(i)p=\pi(i+1)(1-p).
+\]
+Solve for $\pi(i+1)$:
+\[
+\pi(i+1)=\frac{p}{1-p}\pi(i).
+\]
+
+Define
+\[
+r=\frac{p}{1-p}.
+\]
+Then
+\[
+\pi(i+1)=r\,\pi(i).
+\]
+
+This means each time we move one state to the right, the stationary probability is multiplied by $r$.
+
+\paragraph{Step 2: Express all states in terms of one unknown.}
+
+From
+\[
+\pi(i+1)=r\pi(i),
+\]
+we get
+\[
+\pi(2)=r\pi(1), \qquad \pi(3)=r\pi(2)=r^2\pi(1),
+\]
+and in general
+\[
+\pi(i)=\pi(1)r^{i-1}, \qquad 1\le i\le n-1.
+\]
+
+Now relate $\pi(1)$ to $\pi(0)$ using the left boundary:
+\[
+\pi(0)P(0,1)=\pi(1)P(1,0).
+\]
+Since
+\[
+P(0,1)=1, \qquad P(1,0)=1-p,
+\]
+we get
+\[
+\pi(0)=\pi(1)(1-p),
+\]
+so
+\[
+\pi(1)=\frac{\pi(0)}{1-p}.
+\]
+
+Substitute this into the interior formula:
+\[
+\pi(i)=\frac{\pi(0)}{1-p}r^{i-1}, \qquad 1\le i\le n-1.
+\]
+
+For the right endpoint $n$, use the edge relation
+\[
+\pi(n-1)P(n-1,n)=\pi(n)P(n,n-1).
+\]
+That is,
+\[
+\pi(n-1)p=\pi(n)\cdot 1,
+\]
+so
+\[
+\pi(n)=p\,\pi(n-1).
+\]
+Since
+\[
+\pi(n-1)=\frac{\pi(0)}{1-p}r^{n-2},
+\]
+we get
+\[
+\pi(n)=p\cdot \frac{\pi(0)}{1-p}r^{n-2}
+=\pi(0)r^{n-1}.
+\]
+
+\paragraph{Step 3: Normalize.}
+
+All probabilities must add to $1$:
+\[
+\sum_{i=0}^n \pi(i)=1.
+\]
+So
+\[
+\pi(0)+\sum_{i=1}^{n-1}\frac{\pi(0)}{1-p}r^{i-1}+\pi(0)r^{n-1}=1.
+\]
+
+This determines $\pi(0)$, and then every other $\pi(i)$ follows.
+
+\bigskip
+\noindent
+\textbf{Final form:}
+\[
+\pi(0)=c,
+\]
+\[
+\pi(i)=\frac{c}{1-p}\left(\frac{p}{1-p}\right)^{i-1}, \qquad 1\le i\le n-1,
+\]
+\[
+\pi(n)=c\left(\frac{p}{1-p}\right)^{n-1},
+\]
+where $c$ is chosen so that the probabilities sum to $1$.
+
+\subsection*{(c) Mean return times when $p=2/3$ and $n=4$}
+
+We now plug in
+\[
+p=\frac23, \qquad n=4.
+\]
+
+\paragraph{Step 1: Compute the ratio $r$.}
+
+\[
+r=\frac{p}{1-p}
+=\frac{2/3}{1/3}
+=2.
+\]
+
+\paragraph{Step 2: Write the stationary probabilities up to a constant.}
+
+Let
+\[
+\pi(0)=c.
+\]
+Then
+\[
+\pi(1)=\frac{c}{1-p}
+=\frac{c}{1/3}
+=3c.
+\]
+Now move to the right using multiplication by $r=2$:
+\[
+\pi(2)=2\pi(1)=6c,
+\]
+\[
+\pi(3)=2\pi(2)=12c.
+\]
+For the last state,
+\[
+\pi(4)=c\,r^3=8c.
+\]
+
+So
+\[
+\pi=(c,\,3c,\,6c,\,12c,\,8c).
+\]
+
+\paragraph{Step 3: Normalize.}
+
+Since probabilities must sum to $1$,
+\[
+c+3c+6c+12c+8c=1.
+\]
+So
+\[
+30c=1
+\qquad \Longrightarrow \qquad
+c=\frac{1}{30}.
+\]
+
+Thus
+\[
+\pi(0)=\frac{1}{30},\quad
+\pi(1)=\frac{3}{30},\quad
+\pi(2)=\frac{6}{30},\quad
+\pi(3)=\frac{12}{30},\quad
+\pi(4)=\frac{8}{30}.
+\]
+
+\paragraph{Step 4: Use the return-time formula.}
+
+For an irreducible positive recurrent Markov chain,
+\[
+E_i[T_i]=\frac{1}{\pi(i)}.
+\]
+This means the expected return time to state $i$ is the reciprocal of its long-run stationary probability.
+
+Therefore,
+\[
+E_1[T_1]=\frac{1}{\pi(1)}=\frac{1}{3/30}=10,
+\]
+\[
+E_2[T_2]=\frac{1}{\pi(2)}=\frac{1}{6/30}=5,
+\]
+\[
+E_3[T_3]=\frac{1}{\pi(3)}=\frac{1}{12/30}=\frac{30}{12}=\frac52.
+\]
+
+\bigskip
+\noindent
+\textbf{Answer:}
+\[
+E_1[T_1]=10,\qquad E_2[T_2]=5,\qquad E_3[T_3]=\frac52.
+\]
+
+\subsection*{(d) Fraction of time at the endpoints}
+
+A key interpretation of the stationary distribution is:
+\[
+\pi(j)=\text{long-run fraction of time spent in state }j.
+\]
+
+So the long-run fraction of time spent at state $0$ is
+\[
+\pi(0)=\frac{1}{30},
+\]
+and at state $4$ is
+\[
+\pi(4)=\frac{8}{30}=\frac{4}{15}.
+\]
+
+\bigskip
+\noindent
+\textbf{Interpretation.}  
+Because $p=2/3$, the chain prefers moving right.
+So in the long run it spends much more time near the right side than the left side.
+
+\newpage
+
+\section*{Problem 2}
+
+Consider a Markov chain on $\mathbb N=\{0,1,2,\dots\}$ with transitions
+\[
+P(i,i+1)=p,\quad P(i,i-1)=1-p, \quad i\ge1,
+\]
+and
+\[
+P(0,1)=1.
+\]
+
+\bigskip
+
+This is similar to Problem 1, except now the state space is infinite:
+\[
+0,1,2,3,\dots
+\]
+So we must be more careful. On an infinite state space, a stationary distribution might exist, or it might not.
+
+\subsection*{(a) Stationary distribution for $p<1/2$}
+
+Assume
+\[
+p<\frac12.
+\]
+That means moving left is more likely than moving right, so the chain tends to drift back toward $0$.
+
+\paragraph{Step 1: Use detailed balance.}
+
+For neighboring states $i$ and $i+1$ with $i\ge1$,
+\[
+\pi(i)P(i,i+1)=\pi(i+1)P(i+1,i).
+\]
+So
+\[
+\pi(i)p=\pi(i+1)(1-p).
+\]
+Hence
+\[
+\pi(i+1)=\frac{p}{1-p}\pi(i).
+\]
+
+Let
+\[
+r=\frac{p}{1-p}.
+\]
+Then
+\[
+\pi(i+1)=r\pi(i).
+\]
+
+Since $p<1/2$, we have $r<1$.
+This matters because if the probabilities shrink geometrically, the infinite sum may converge.
+
+\paragraph{Step 2: Express everything in terms of $\pi(0)$.}
+
+At the boundary,
+\[
+\pi(0)P(0,1)=\pi(1)P(1,0).
+\]
+So
+\[
+\pi(0)\cdot 1=\pi(1)(1-p),
+\]
+hence
+\[
+\pi(1)=\frac{\pi(0)}{1-p}.
+\]
+
+Now for $i\ge1$,
+\[
+\pi(i)=\pi(1)r^{i-1}
+=\frac{\pi(0)}{1-p}r^{i-1}.
+\]
+
+\paragraph{Step 3: Normalize.}
+
+A probability distribution must sum to $1$:
+\[
+1=\pi(0)+\sum_{i=1}^{\infty}\pi(i)
+=\pi(0)+\sum_{i=1}^{\infty}\frac{\pi(0)}{1-p}r^{i-1}.
+\]
+Factor out the constant:
+\[
+1=\pi(0)+\frac{\pi(0)}{1-p}\sum_{i=1}^{\infty}r^{i-1}.
+\]
+
+Since $|r|<1$, we can use the geometric series formula:
+\[
+\sum_{i=1}^{\infty}r^{i-1}=\sum_{k=0}^{\infty}r^k=\frac{1}{1-r}.
+\]
+So
+\[
+1=\pi(0)+\frac{\pi(0)}{1-p}\cdot \frac{1}{1-r}.
+\]
+
+Now simplify $1-r$:
+\[
+1-r=1-\frac{p}{1-p}
+=\frac{1-p-p}{1-p}
+=\frac{1-2p}{1-p}.
+\]
+Therefore
+\[
+\frac{1}{1-r}=\frac{1-p}{1-2p}.
+\]
+Substitute:
+\[
+1=\pi(0)+\frac{\pi(0)}{1-p}\cdot \frac{1-p}{1-2p}
+=\pi(0)+\frac{\pi(0)}{1-2p}.
+\]
+
+Factor out $\pi(0)$:
+\[
+1=\pi(0)\left(1+\frac{1}{1-2p}\right).
+\]
+Combine the terms:
+\[
+1+\frac{1}{1-2p}
+=\frac{1-2p+1}{1-2p}
+=\frac{2(1-p)}{1-2p}.
+\]
+So
+\[
+1=\pi(0)\frac{2(1-p)}{1-2p},
+\]
+which gives
+\[
+\pi(0)=\frac{1-2p}{2(1-p)}.
+\]
+
+\paragraph{Step 4: Write the full stationary distribution.}
+
+Since
+\[
+\pi(i)=\frac{\pi(0)}{1-p}r^{i-1},
+\]
+we get
+\[
+\pi(i)=\frac{1-2p}{2(1-p)^2}\left(\frac{p}{1-p}\right)^{i-1},
+\qquad i\ge1.
+\]
+
+Thus
+\[
+\boxed{
+\pi(0)=\frac{1-2p}{2(1-p)},\qquad
+\pi(i)=\frac{1-2p}{2(1-p)^2}\left(\frac{p}{1-p}\right)^{i-1},\ i\ge1.
+}
+\]
+
+\paragraph{Step 5: Classify the chain.}
+
+Because the chain is irreducible and we found a valid stationary distribution, it is \textbf{positive recurrent}.
+
+\subsection*{(b) Limiting fraction of time at $0$}
+
+For an irreducible positive recurrent Markov chain, the long-run fraction of time spent in state $j$ equals $\pi(j)$.
+
+So the limiting fraction of time at $0$ is
+\[
+\boxed{
+\pi(0)=\frac{1-2p}{2(1-p)}.
+}
+\]
+
+In indicator notation,
+\[
+\lim_{T\to\infty}\frac1T\sum_{t=1}^T \mathbf 1_{\{X_t=0\}}
+=
+\frac{1-2p}{2(1-p)}
+\qquad \text{almost surely.}
+\]
+
+\subsection*{(c) Case $p=1/2$}
+
+Now suppose
+\[
+p=\frac12.
+\]
+This is the \textbf{fair} case.
+
+We define
+\[
+f(i)=P(\tau_0<\infty \mid X_0=i),
+\]
+where $\tau_0$ is the first time the chain hits $0$.
+
+So $f(i)$ means: starting from state $i$, what is the probability that the chain ever reaches $0$?
+
+\paragraph{Step 1: Write the recursion.}
+
+If $i\ge1$, then conditioning on the first step gives
+\[
+f(i)=\frac12 f(i+1)+\frac12 f(i-1).
+\]
+Why? Because from $i$ the chain moves to $i+1$ or $i-1$ with equal probability, and then the future hitting probability is $f(i+1)$ or $f(i-1)$.
+
+Multiply by $2$:
+\[
+2f(i)=f(i+1)+f(i-1).
+\]
+Rearrange:
+\[
+f(i+1)-f(i)=f(i)-f(i-1).
+\]
+So the successive differences are constant, which means $f(i)$ must be linear:
+\[
+f(i)=a+bi.
+\]
+
+\paragraph{Step 2: Use the fact that $f(i)$ is a probability.}
+
+Since $f(i)$ is a probability,
+\[
+0\le f(i)\le1 \qquad \text{for all } i.
+\]
+If $b\neq0$, then the linear function $a+bi$ will eventually leave the interval $[0,1]$ as $i\to\infty$.
+So we must have
+\[
+b=0.
+\]
+Thus $f(i)$ is constant.
+
+Since
+\[
+f(0)=1,
+\]
+that constant must be $1$:
+\[
+f(i)=1 \qquad \text{for all } i.
+\]
+
+So the chain hits $0$ with probability $1$ from every starting state. Therefore the chain is \textbf{recurrent}.
+
+\paragraph{Step 3: Check for a stationary distribution.}
+
+Detailed balance gives
+\[
+\pi(i+1)=\frac{p}{1-p}\pi(i).
+\]
+If $p=1/2$, then
+\[
+\pi(i+1)=\pi(i), \qquad i\ge1.
+\]
+So all states $1,2,3,\dots$ must have the same stationary probability.
+
+At the boundary,
+\[
+\pi(0)\cdot 1=\pi(1)\cdot \frac12,
+\]
+so
+\[
+\pi(1)=2\pi(0).
+\]
+Hence
+\[
+\pi(i)=2\pi(0), \qquad i\ge1.
+\]
+
+But then
+\[
+\sum_{i=0}^\infty \pi(i)
+=
+\pi(0)+\sum_{i=1}^\infty 2\pi(0),
+\]
+which diverges unless $\pi(0)=0$, and that would force all probabilities to be zero.
+
+So no stationary distribution exists.
+
+\paragraph{Step 4: Final classification.}
+
+The chain is recurrent, but it has no stationary distribution.
+Therefore it is \textbf{null recurrent}.
+
+\subsection*{(d) Case $p>1/2$}
+
+Now suppose
+\[
+p>\frac12.
+\]
+This means the chain prefers moving to the right, so we expect it may escape to infinity and fail to return to $0$.
+
+Again define
+\[
+f(i)=P(\tau_0<\infty \mid X_0=i).
+\]
+
+\paragraph{Step 1: Write the recursion.}
+
+For $i\ge1$,
+\[
+f(i)=pf(i+1)+(1-p)f(i-1),
+\]
+and
+\[
+f(0)=1.
+\]
+
+\paragraph{Step 2: Try an exponential solution.}
+
+A common method for linear recursions is to guess
+\[
+f(i)=\lambda^i.
+\]
+Substitute into the recursion:
+\[
+\lambda^i=p\lambda^{i+1}+(1-p)\lambda^{i-1}.
+\]
+Divide by $\lambda^{i-1}$:
+\[
+\lambda=p\lambda^2+(1-p).
+\]
+Rearrange:
+\[
+p\lambda^2-\lambda+(1-p)=0.
+\]
+
+The roots are
+\[
+\lambda_1=1,
+\qquad
+\lambda_2=\frac{1-p}{p}.
+\]
+Let
+\[
+\rho=\frac{1-p}{p}.
+\]
+Since $p>1/2$, we have
+\[
+0<\rho<1.
+\]
+
+So the general solution is
+\[
+f(i)=A+B\rho^i.
+\]
+
+\paragraph{Step 3: Use boundary behavior.}
+
+If the chain starts farther and farther to the right, the probability of ever hitting $0$ should go to $0$:
+\[
+\lim_{i\to\infty}f(i)=0.
+\]
+In the formula
+\[
+f(i)=A+B\rho^i,
+\]
+the term $\rho^i\to0$, so the limit is $A$.
+Hence
+\[
+A=0.
+\]
+
+So
+\[
+f(i)=B\rho^i.
+\]
+Now use
+\[
+f(0)=1.
+\]
+Then
+\[
+1=B\rho^0=B,
+\]
+so
+\[
+B=1.
+\]
+
+Therefore
+\[
+\boxed{
+f(i)=\left(\frac{1-p}{p}\right)^i.
+}
+\]
+
+\paragraph{Step 4: Classify the chain.}
+
+For $i\ge1$,
+\[
+f(i)=\left(\frac{1-p}{p}\right)^i<1.
+\]
+So there is a positive probability that the chain \emph{never} reaches $0$.
+
+Therefore the chain is \textbf{transient}.
+
+\newpage
+
+\section*{Problem 3}
+
+Suppose
+\[
+Y_i\mid \beta \sim \text{Bernoulli}(p_i),
+\qquad
+p_i=\frac{e^{\beta x_i}}{1+e^{\beta x_i}},
+\qquad i=1,\dots,n,
+\]
+and the prior on $\beta$ is
+\[
+\beta \sim N(0,\tau^2).
+\]
+
+We want to study the posterior distribution of $\beta$ and write down a Metropolis-Hastings algorithm.
+
+\subsection*{(a) Posterior distribution up to proportionality}
+
+\paragraph{Step 1: Write the likelihood.}
+
+For Bernoulli data,
+\[
+P(Y_i=y_i\mid \beta)=p_i^{y_i}(1-p_i)^{1-y_i}.
+\]
+Because the observations are conditionally independent given $\beta$, the full likelihood is
+\[
+L(\beta)
+=
+\prod_{i=1}^n p_i^{y_i}(1-p_i)^{1-y_i}.
+\]
+
+Now plug in
+\[
+p_i=\frac{e^{\beta x_i}}{1+e^{\beta x_i}},
+\qquad
+1-p_i=\frac{1}{1+e^{\beta x_i}}.
+\]
+So
+\[
+L(\beta)
+=
+\prod_{i=1}^n
+\left(\frac{e^{\beta x_i}}{1+e^{\beta x_i}}\right)^{y_i}
+\left(\frac{1}{1+e^{\beta x_i}}\right)^{1-y_i}.
+\]
+
+\paragraph{Step 2: Write the prior density.}
+
+Since
+\[
+\beta\sim N(0,\tau^2),
+\]
+its density is proportional to
+\[
+\exp\left(-\frac{\beta^2}{2\tau^2}\right).
+\]
+
+\paragraph{Step 3: Multiply likelihood and prior.}
+
+Bayes' rule tells us
+\[
+p(\beta\mid y,x)\propto L(\beta)\,p(\beta).
+\]
+Therefore
+\[
+\boxed{
+p(\beta\mid y,x)\propto
+\left[
+\prod_{i=1}^n
+\left(\frac{e^{\beta x_i}}{1+e^{\beta x_i}}\right)^{y_i}
+\left(\frac{1}{1+e^{\beta x_i}}\right)^{1-y_i}
+\right]
+\exp\left(-\frac{\beta^2}{2\tau^2}\right).
+}
+\]
+
+\paragraph{Step 4: Write the log-posterior.}
+
+Taking logs is useful because products become sums:
+\[
+\log p(\beta\mid y,x)
+=
+\sum_{i=1}^n
+\left[
+y_i\beta x_i-\log(1+e^{\beta x_i})
+\right]
+-\frac{\beta^2}{2\tau^2}
++C,
+\]
+where $C$ is a constant that does not depend on $\beta$.
+
+So
+\[
+\boxed{
+\log p(\beta\mid y,x)
+=
+\sum_{i=1}^n
+\left[
+y_i\beta x_i-\log(1+e^{\beta x_i})
+\right]
+-\frac{\beta^2}{2\tau^2}
++C.
+}
+\]
+
+\subsection*{(b) Random-walk proposal $\beta^\star\sim N(\beta^{(t)},s^2)$}
+
+\paragraph{Step 1: Recall the MH acceptance probability.}
+
+In Metropolis-Hastings, if the current state is $\beta^{(t)}$ and we propose $\beta^\star$, then the acceptance probability is
+\[
+\alpha(\beta^{(t)},\beta^\star)
+=
+\min\left\{
+1,\,
+\frac{p(\beta^\star\mid y,x)\,q(\beta^{(t)}\mid \beta^\star)}
+{p(\beta^{(t)}\mid y,x)\,q(\beta^\star\mid \beta^{(t)})}
+\right\}.
+\]
+
+\paragraph{Step 2: Use symmetry of the proposal.}
+
+Here
+\[
+q(\beta^\star\mid \beta^{(t)})=\phi(\beta^\star;\beta^{(t)},s^2),
+\]
+which is symmetric:
+\[
+q(\beta^\star\mid \beta^{(t)})
+=
+q(\beta^{(t)}\mid \beta^\star).
+\]
+So those proposal densities cancel.
+
+Hence
+\[
+\boxed{
+\alpha(\beta^{(t)},\beta^\star)
+=
+\min\left\{
+1,\,
+\frac{p(\beta^\star\mid y,x)}{p(\beta^{(t)}\mid y,x)}
+\right\}.
+}
+\]
+
+\paragraph{Step 3: Write the ratio in exponential form.}
+
+Using the log-posterior,
+\[
+\log\frac{p(\beta^\star\mid y,x)}{p(\beta^{(t)}\mid y,x)}
+=
+\sum_{i=1}^n y_i x_i(\beta^\star-\beta^{(t)})
+-
+\sum_{i=1}^n
+\log\frac{1+e^{\beta^\star x_i}}{1+e^{\beta^{(t)}x_i}}
+-
+\frac{(\beta^\star)^2-(\beta^{(t)})^2}{2\tau^2}.
+\]
+Exponentiating gives
+\[
+\alpha
+=
+\min\left\{
+1,\,
+\exp\left[
+\sum_{i=1}^n y_i x_i(\beta^\star-\beta^{(t)})
+-
+\sum_{i=1}^n
+\log\frac{1+e^{\beta^\star x_i}}{1+e^{\beta^{(t)}x_i}}
+-
+\frac{(\beta^\star)^2-(\beta^{(t)})^2}{2\tau^2}
+\right]
+\right\}.
+\]
+
+\paragraph{Step 4: State the algorithm in words.}
+
+One Metropolis-Hastings iteration is:
+\begin{enumerate}[leftmargin=1.8em]
+    \item Start with the current value $\beta^{(t)}$.
+    \item Propose a new value
+    \[
+    \beta^\star\sim N(\beta^{(t)},s^2).
+    \]
+    \item Compute the acceptance probability $\alpha$ above.
+    \item With probability $\alpha$, accept the proposal and set
+    \[
+    \beta^{(t+1)}=\beta^\star.
+    \]
+    \item Otherwise reject it and keep
+    \[
+    \beta^{(t+1)}=\beta^{(t)}.
+    \]
+\end{enumerate}
+
+\subsection*{(c) Non-symmetric proposal $\beta^\star\sim N(\beta^{(t)}+c,s^2)$}
+
+Now the proposal is no longer centered at the current point, so the proposal is \emph{not} symmetric.
+
+\paragraph{Step 1: Write the general MH formula again.}
+
+\[
+\alpha
+=
+\min\left\{
+1,\,
+\frac{p(\beta^\star\mid y,x)\,q(\beta^{(t)}\mid \beta^\star)}
+{p(\beta^{(t)}\mid y,x)\,q(\beta^\star\mid \beta^{(t)})}
+\right\}.
+\]
+
+\paragraph{Step 2: Write the two Gaussian proposal densities.}
+
+Forward proposal:
+\[
+q(\beta^\star\mid \beta^{(t)})
+=
+\phi(\beta^\star;\beta^{(t)}+c,s^2).
+\]
+
+Reverse proposal:
+\[
+q(\beta^{(t)}\mid \beta^\star)
+=
+\phi(\beta^{(t)};\beta^\star+c,s^2).
+\]
+
+For a normal density, terms not involving the exponent cancel in the ratio, so
+\[
+\frac{q(\beta^{(t)}\mid \beta^\star)}{q(\beta^\star\mid \beta^{(t)})}
+=
+\exp\left(
+\frac{2c(\beta^{(t)}-\beta^\star)}{s^2}
+\right).
+\]
+
+\paragraph{Step 3: Final acceptance probability.}
+
+Therefore
+\[
+\boxed{
+\alpha
+=
+\min\left\{
+1,\,
+\frac{p(\beta^\star\mid y,x)}{p(\beta^{(t)}\mid y,x)}
+\exp\left(
+\frac{2c(\beta^{(t)}-\beta^\star)}{s^2}
+\right)
+\right\}.
+}
+\]
+
+\paragraph{Why is the extra factor needed?}
+
+Because the proposal is biased in one direction.
+The MH correction factor
+\[
+\frac{q(\beta^{(t)}\mid \beta^\star)}{q(\beta^\star\mid \beta^{(t)})}
+\]
+adjusts for that asymmetry so that the chain still has the correct posterior as its stationary distribution.
+
+\subsection*{(d) Interpreting MCMC output}
+
+Suppose the posterior summary is:
+\begin{itemize}[leftmargin=1.5em]
+    \item posterior mean $=2.80$,
+    \item posterior sd $=0.50$,
+    \item 95\% credible interval $(1.90,3.80)$,
+    \item $P(\beta>0)=0.999$,
+    \item acceptance rate $=0.33$.
+\end{itemize}
+
+\paragraph{(i) Is the proposal variance well tuned?}
+
+An acceptance rate around $0.33$ is usually considered reasonable for a one-dimensional random-walk Metropolis algorithm.
+It is not too small and not too large.
+
+So the proposal scale appears to be \textbf{well tuned}.
+
+\paragraph{(ii) Is the prior influential?}
+
+The prior is $N(0,25)$, so its standard deviation is
+\[
+\sqrt{25}=5.
+\]
+The posterior standard deviation is only
+\[
+0.50.
+\]
+That is much smaller, which means the data have sharply concentrated the posterior.
+
+So the data are \textbf{much more informative than the prior}, and the prior is not dominating the result.
+
+\paragraph{(iii) Is there evidence that $\beta>0$?}
+
+Yes, very strong evidence.
+
+Why?
+\begin{itemize}[leftmargin=1.5em]
+    \item The 95\% credible interval $(1.90,3.80)$ is entirely above $0$.
+    \item Also $P(\beta>0)=0.999$, meaning the posterior places 99.9\% probability above zero.
+\end{itemize}
+
+So the posterior strongly supports
+\[
+\beta>0.
+\]
+
+\paragraph{(iv) Interpret $e^\beta$.}
+
+In logistic regression, $e^\beta$ is an \textbf{odds ratio} associated with a one-unit increase in $x$.
+
+If the posterior mode is near $\beta\approx 3$, then the MAP estimate of $e^\beta$ is approximately
+\[
+e^3\approx 20.1.
+\]
+
+A 95\% credible interval for $e^\beta$ is obtained by exponentiating the credible interval for $\beta$:
+\[
+\left(e^{1.9},e^{3.8}\right)\approx (6.69,44.7).
+\]
+
+So the estimated odds multiplier is about
+\[
+20,
+\]
+with a plausible range from about $6.7$ to $44.7$.
+
+\bigskip
+\noindent
+\textbf{Interpretation in words.}  
+A one-unit increase in $x$ multiplies the odds of success by roughly $20$.
+
+\newpage
+
+\section*{Problem 4}
+
+Consider the two-component Gaussian mixture model
+\[
+y_i \mid z_i,\mu_0,\mu_1,\sigma^2
+\sim
+\begin{cases}
+N(\mu_0,\sigma^2), & z_i=0,\\[0.3em]
+N(\mu_1,\sigma^2), & z_i=1,
+\end{cases}
+\]
+with latent allocations
+\[
+z_i\mid \pi \sim \text{Bernoulli}(\pi),
+\]
+prior
+\[
+\pi\sim \text{Beta}(a,b),
+\]
+priors
+\[
+\mu_0\sim N(m_0,s_0^2),
+\qquad
+\mu_1\sim N(m_1,s_1^2),
+\]
+and
+\[
+\sigma^2\sim \text{Inv-Gamma}(\alpha,\beta).
+\]
+
+We derive the full conditional distributions for a Gibbs sampler.
+
+\subsection*{(a) Full conditional for $z_i$}
+
+We want
+\[
+P(z_i=1\mid \pi,\mu_0,\mu_1,\sigma^2,y_i).
+\]
+
+\paragraph{Step 1: Use Bayes' rule.}
+
+Conditioning on everything except $z_i$, the two possibilities are $z_i=1$ or $z_i=0$.
+
+Up to proportionality,
+\[
+P(z_i=1\mid \cdots)\propto P(z_i=1\mid \pi)\,f(y_i\mid z_i=1,\mu_1,\sigma^2),
+\]
+\[
+P(z_i=0\mid \cdots)\propto P(z_i=0\mid \pi)\,f(y_i\mid z_i=0,\mu_0,\sigma^2).
+\]
+
+Now,
+\[
+P(z_i=1\mid \pi)=\pi,
+\qquad
+P(z_i=0\mid \pi)=1-\pi,
+\]
+and
+\[
+f(y_i\mid z_i=1,\mu_1,\sigma^2)=\phi(y_i;\mu_1,\sigma^2),
+\]
+\[
+f(y_i\mid z_i=0,\mu_0,\sigma^2)=\phi(y_i;\mu_0,\sigma^2).
+\]
+
+\paragraph{Step 2: Normalize.}
+
+Therefore
+\[
+P(z_i=1\mid \cdots)
+=
+\frac{\pi\,\phi(y_i;\mu_1,\sigma^2)}
+{\pi\,\phi(y_i;\mu_1,\sigma^2)+(1-\pi)\,\phi(y_i;\mu_0,\sigma^2)}.
+\]
+
+So
+\[
+\boxed{
+z_i\mid \cdots \sim \text{Bernoulli}(w_i),
+\qquad
+w_i=
+\frac{\pi\,\phi(y_i;\mu_1,\sigma^2)}
+{\pi\,\phi(y_i;\mu_1,\sigma^2)+(1-\pi)\,\phi(y_i;\mu_0,\sigma^2)}.
+}
+\]
+
+\paragraph{Interpretation.}  
+Each observation is probabilistically assigned to one of the two mixture components.
+If $y_i$ is more likely under component $1$ than component $0$, then $w_i$ will be closer to $1$.
+
+\subsection*{(b) Full conditional for $\pi$}
+
+Let
+\[
+n_1=\sum_{i=1}^n z_i,
+\qquad
+n_0=n-n_1.
+\]
+
+\paragraph{Step 1: Write prior and likelihood in terms of $\pi$.}
+
+The prior is
+\[
+\pi\sim \text{Beta}(a,b),
+\]
+so its density is proportional to
+\[
+\pi^{a-1}(1-\pi)^{b-1}.
+\]
+
+Given the $z_i$ values, the likelihood for $\pi$ is
+\[
+\prod_{i=1}^n \pi^{z_i}(1-\pi)^{1-z_i}
+=
+\pi^{n_1}(1-\pi)^{n_0}.
+\]
+
+\paragraph{Step 2: Multiply prior and likelihood.}
+
+Thus the conditional density is proportional to
+\[
+\pi^{a-1}(1-\pi)^{b-1}\pi^{n_1}(1-\pi)^{n_0}
+=
+\pi^{a+n_1-1}(1-\pi)^{b+n_0-1}.
+\]
+
+That is the kernel of a Beta distribution.
+
+So
+\[
+\boxed{
+\pi\mid z \sim \text{Beta}(a+n_1,\ b+n_0).
+}
+\]
+
+\subsection*{(c) Full conditionals for $\mu_0$ and $\mu_1$}
+
+We derive $\mu_0$; the derivation for $\mu_1$ is identical.
+
+Let
+\[
+I_0=\{i:z_i=0\},
+\qquad
+n_0=|I_0|.
+\]
+
+\paragraph{Step 1: Collect all terms involving $\mu_0$.}
+
+The prior is
+\[
+\mu_0\sim N(m_0,s_0^2).
+\]
+For each $i$ with $z_i=0$, we have
+\[
+y_i\mid \mu_0,\sigma^2 \sim N(\mu_0,\sigma^2).
+\]
+
+Normal prior + normal likelihood gives a normal posterior.
+So we know the full conditional will be normal.
+
+\paragraph{Step 2: State the posterior variance and mean.}
+
+The posterior precision is the sum of prior precision and data precision:
+\[
+\frac{1}{v_0^\star}
+=
+\frac{1}{s_0^2}
++
+\frac{n_0}{\sigma^2}.
+\]
+So
+\[
+v_0^\star
+=
+\left(
+\frac{1}{s_0^2}
++
+\frac{n_0}{\sigma^2}
+\right)^{-1}.
+\]
+
+The posterior mean is a precision-weighted average:
+\[
+m_0^\star
+=
+v_0^\star
+\left(
+\frac{m_0}{s_0^2}
++
+\frac{\sum_{i:z_i=0} y_i}{\sigma^2}
+\right).
+\]
+
+Hence
+\[
+\boxed{
+\mu_0\mid z,\sigma^2,y \sim N(m_0^\star,v_0^\star),
+}
+\]
+where
+\[
+\boxed{
+v_0^\star=
+\left(
+\frac{1}{s_0^2}
++
+\frac{n_0}{\sigma^2}
+\right)^{-1},
+\qquad
+m_0^\star=
+v_0^\star
+\left(
+\frac{m_0}{s_0^2}
++
+\frac{\sum_{i:z_i=0} y_i}{\sigma^2}
+\right).
+}
+\]
+
+Similarly,
+\[
+\boxed{
+\mu_1\mid z,\sigma^2,y \sim N(m_1^\star,v_1^\star),
+}
+\]
+with
+\[
+\boxed{
+v_1^\star=
+\left(
+\frac{1}{s_1^2}
++
+\frac{n_1}{\sigma^2}
+\right)^{-1},
+\qquad
+m_1^\star=
+v_1^\star
+\left(
+\frac{m_1}{s_1^2}
++
+\frac{\sum_{i:z_i=1} y_i}{\sigma^2}
+\right).
+}
+\]
+
+\paragraph{Interpretation.}  
+Each posterior mean is a compromise between:
+\begin{itemize}[leftmargin=1.5em]
+    \item the prior mean, and
+    \item the sample mean of the data assigned to that component.
+\end{itemize}
+
+\subsection*{(d) Full conditional for $\sigma^2$}
+
+\paragraph{Step 1: Write the prior.}
+
+We have
+\[
+\sigma^2\sim \text{Inv-Gamma}(\alpha,\beta).
+\]
+Its kernel is
+\[
+(\sigma^2)^{-(\alpha+1)}\exp\left(-\frac{\beta}{\sigma^2}\right).
+\]
+
+\paragraph{Step 2: Write the likelihood in terms of $\sigma^2$.}
+
+Conditional on allocations and means, the observations are normal with variance $\sigma^2$.
+So the likelihood kernel is
+\[
+(\sigma^2)^{-n/2}
+\exp\left(
+-\frac{1}{2\sigma^2}\sum_{i=1}^n (y_i-\mu_{z_i})^2
+\right).
+\]
+
+\paragraph{Step 3: Multiply prior and likelihood.}
+
+Combining exponents and powers of $\sigma^2$ gives
+\[
+(\sigma^2)^{-(\alpha+1+n/2)}
+\exp\left(
+-\frac{1}{\sigma^2}
+\left[
+\beta+\frac12\sum_{i=1}^n (y_i-\mu_{z_i})^2
+\right]
+\right).
+\]
+That is the kernel of an inverse-gamma distribution.
+
+So
+\[
+\boxed{
+\sigma^2\mid z,\mu_0,\mu_1,y
+\sim
+\text{Inv-Gamma}
+\left(
+\alpha+\frac n2,\,
+\beta+\frac12\sum_{i=1}^n (y_i-\mu_{z_i})^2
+\right).
+}
+\]
+
+\subsection*{(e) One Gibbs sampling sweep}
+
+A Gibbs sampler cycles through the full conditionals one at a time.
+
+One full sweep is:
+\begin{enumerate}[leftmargin=1.8em]
+    \item For each $i=1,\dots,n$, sample
+    \[
+    z_i\mid \pi,\mu_0,\mu_1,\sigma^2,y_i.
+    \]
+    \item Sample
+    \[
+    \pi\mid z.
+    \]
+    \item Sample
+    \[
+    \mu_0\mid z,\sigma^2,y.
+    \]
+    \item Sample
+    \[
+    \mu_1\mid z,\sigma^2,y.
+    \]
+    \item Sample
+    \[
+    \sigma^2\mid z,\mu_0,\mu_1,y.
+    \]
+\end{enumerate}
+
+\bigskip
+\noindent
+\textbf{Main idea.}  
+Each step samples from the exact conditional distribution of one block of unknowns, given the current values of everything else.
+
+\newpage
+
+\section*{Problem 5}
+
+Suppose meteor arrivals are modeled by a Poisson process.
+
+\subsection*{(a) Off-peak homogeneous Poisson process}
+
+Assume arrivals occur as a homogeneous Poisson process with constant rate $\lambda$ meteors per minute.
+Suppose 28 meteors were observed in 120 minutes.
+
+\subsubsection*{(i) Find the MLE of $\lambda$}
+
+For a homogeneous Poisson process observed for time $T$, the count
+\[
+N(T)\sim \text{Poisson}(\lambda T).
+\]
+The maximum likelihood estimator is
+\[
+\hat\lambda=\frac{N(T)}{T}.
+\]
+
+Here
+\[
+N(T)=28,\qquad T=120.
+\]
+So
+\[
+\hat\lambda=\frac{28}{120}=\frac{7}{30}\approx 0.2333
+\]
+meteors per minute.
+
+\[
+\boxed{\hat\lambda=\frac{7}{30}\approx 0.2333}
+\]
+
+\subsubsection*{(ii) Correct for 80\% detection}
+
+If only 80\% of meteors are detected, then the observed rate is only
+\[
+0.8\times(\text{true rate}).
+\]
+So
+\[
+\hat\lambda_{\text{true}}=\frac{\hat\lambda_{\text{obs}}}{0.8}
+=
+\frac{0.2333}{0.8}
+\approx 0.2917.
+\]
+
+\[
+\boxed{\hat\lambda_{\text{true}}\approx 0.2917}
+\]
+
+\subsubsection*{(iii) Expected extra time to see 2 more meteors}
+
+In a Poisson process with rate $\lambda$, the waiting time to the next event is exponential with mean
+\[
+\frac{1}{\lambda}.
+\]
+More generally, the waiting time to $k$ additional events has Gamma distribution with mean
+\[
+\frac{k}{\lambda}.
+\]
+
+So the expected additional time to see 2 more meteors is
+\[
+\frac{2}{\hat\lambda}
+=
+\frac{2}{7/30}
+=
+\frac{60}{7}
+\approx 8.57 \text{ minutes}.
+\]
+
+\[
+\boxed{\frac{60}{7}\approx 8.57\text{ minutes}}
+\]
+
+\subsubsection*{(iv) Is a shortest gap of 3 seconds surprising?}
+
+First convert 3 seconds to minutes:
+\[
+3\text{ sec} = \frac{3}{60}=0.05 \text{ min}.
+\]
+
+For a homogeneous Poisson process, one interarrival time
+\[
+W\sim \text{Exponential}(\lambda),
+\]
+so
+\[
+P(W\le 0.05)=1-e^{-\lambda(0.05)}.
+\]
+Using $\hat\lambda=7/30$,
+\[
+P(W\le 0.05)=1-e^{-(7/30)(0.05)}
+\approx 0.0116.
+\]
+
+So for \emph{one particular gap}, a 3-second wait is somewhat rare.
+
+But if there were 28 meteors, then there are about 27 interarrival gaps to examine.
+The more gaps we look at, the less surprising it becomes that \emph{at least one} of them is very short.
+
+Approximate:
+\[
+P(\min W_i\le 0.05)
+=
+1-P(W_1>0.05,\dots,W_{27}>0.05).
+\]
+Assuming independence of the interarrival times,
+\[
+P(\min W_i\le 0.05)
+=
+1-\left(e^{-\lambda(0.05)}\right)^{27}
+=
+1-e^{-27\lambda(0.05)}.
+\]
+Plug in $\lambda=7/30$:
+\[
+1-e^{-27(7/30)(0.05)}
+\approx 0.27.
+\]
+
+So the chance is about 27\%.
+That is \emph{not} especially surprising.
+
+\[
+\boxed{\text{A 3-second shortest gap is consistent with the homogeneous model.}}
+\]
+
+\subsection*{(b) Nonhomogeneous Poisson process}
+
+Now suppose the rate changes with time:
+\[
+\lambda(t)=
+\begin{cases}
+0.20, & 0\le t\le 60,\\[0.3em]
+0.20+\dfrac{t-60}{30}, & 60<t\le 90,\\[0.8em]
+0.20+\dfrac{120-t}{30}, & 90<t\le 120,\\[0.8em]
+0.20, & 120<t\le 180.
+\end{cases}
+\]
+
+\subsubsection*{(i) Describe/sketch the rate function}
+
+From $t=0$ to $60$, the rate is constant at $0.2$.
+
+From $60$ to $90$, it increases linearly.
+
+At $t=90$,
+\[
+\lambda(90)=0.20+\frac{90-60}{30}=0.20+1=1.20.
+\]
+
+From $90$ to $120$, it decreases linearly back down.
+
+From $120$ to $180$, it stays constant again at $0.2$.
+
+So the graph is:
+\begin{itemize}[leftmargin=1.5em]
+    \item flat at $0.2$,
+    \item then rising linearly to $1.2$,
+    \item then falling linearly back to $0.2$,
+    \item then flat again.
+\end{itemize}
+
+\subsubsection*{(ii) Expected meteors in the first hour}
+
+For a nonhomogeneous Poisson process, the expected number of arrivals on $[a,b]$ is
+\[
+E[N(b)-N(a)]=\int_a^b \lambda(t)\,dt.
+\]
+
+On $[0,60]$, the rate is constant $0.2$, so
+\[
+E[N(60)]
+=
+\int_0^{60}0.2\,dt
+=
+0.2(60)=12.
+\]
+
+\[
+\boxed{12}
+\]
+
+\subsubsection*{(iii) Probability the first wait is at least 15 minutes}
+
+For an NHPP, the probability of no arrivals by time $t$ is
+\[
+P(T_1>t)=\exp\left(-\int_0^t \lambda(u)\,du\right).
+\]
+
+For $t=15$, the rate is still constant at $0.2$, so
+\[
+\int_0^{15}\lambda(u)\,du
+=
+\int_0^{15}0.2\,du
+=
+3.
+\]
+
+Therefore
+\[
+P(T_1\ge15)=e^{-3}\approx 0.0498.
+\]
+
+\[
+\boxed{e^{-3}\approx 0.0498}
+\]
+
+\subsubsection*{(iv) Compare $[75,105]$ to $[0,30]$}
+
+First interval:
+\[
+E[N(30)-N(0)]=\int_0^{30}0.2\,dt=6.
+\]
+
+Now compute the expected count on $[75,105]$:
+\[
+\int_{75}^{105}\lambda(t)\,dt
+=
+\int_{75}^{90}\left(0.2+\frac{t-60}{30}\right)dt
++
+\int_{90}^{105}\left(0.2+\frac{120-t}{30}\right)dt.
+\]
+
+For the first piece,
+\[
+\int_{75}^{90}\left(0.2+\frac{t-60}{30}\right)dt
+=
+6.75.
+\]
+For the second piece,
+\[
+\int_{90}^{105}\left(0.2+\frac{120-t}{30}\right)dt
+=
+6.75.
+\]
+So total expected count on $[75,105]$ is
+\[
+13.5.
+\]
+
+Difference:
+\[
+13.5-6=7.5.
+\]
+
+\[
+\boxed{7.5}
+\]
+
+\paragraph{Interpretation.}  
+The peak window $[75,105]$ is expected to have 7.5 more meteors than the early baseline window $[0,30]$.
+
+\newpage
+
+\section*{Problem 6}
+
+Suppose a 2D lattice random walk takes 16 steps with counts
+\[
+N_E=6,\qquad N_W=2,\qquad N_N=5,\qquad N_S=3,
+\]
+so the total number of steps is
+\[
+n=16.
+\]
+
+We assume each step is one of East, West, North, South with probabilities
+\[
+p_E,\ p_W,\ p_N,\ p_S,
+\qquad
+p_E+p_W+p_N+p_S=1.
+\]
+
+\subsection*{(a) MLEs of the step probabilities}
+
+This is a multinomial model.
+The maximum likelihood estimator for each category probability is
+\[
+\hat p_j=\frac{\text{count in category }j}{n}.
+\]
+
+Therefore
+\[
+\hat p_E=\frac{6}{16},\qquad
+\hat p_W=\frac{2}{16},\qquad
+\hat p_N=\frac{5}{16},\qquad
+\hat p_S=\frac{3}{16}.
+\]
+
+So
+\[
+\boxed{
+\hat p_E=\frac{6}{16},\quad
+\hat p_W=\frac{2}{16},\quad
+\hat p_N=\frac{5}{16},\quad
+\hat p_S=\frac{3}{16}.
+}
+\]
+
+\subsection*{(b) One-step drift vector}
+
+The \textbf{drift} is the expected change in position in one step.
+
+Let one step be written as the vector
+\[
+\Delta Z_k=
+\begin{cases}
+(1,0), & \text{East},\\
+(-1,0), & \text{West},\\
+(0,1), & \text{North},\\
+(0,-1), & \text{South}.
+\end{cases}
+\]
+
+Then
+\[
+E[\Delta Z_k]
+=
+(1,0)p_E+(-1,0)p_W+(0,1)p_N+(0,-1)p_S.
+\]
+Combine the $x$ and $y$ parts:
+\[
+E[\Delta Z_k]
+=
+(p_E-p_W,\ p_N-p_S).
+\]
+
+Using the MLEs,
+\[
+\hat\delta
+=
+\left(
+\frac{6}{16}-\frac{2}{16},
+\frac{5}{16}-\frac{3}{16}
+\right)
+=
+\left(\frac14,\frac18\right).
+\]
+
+\[
+\boxed{\hat\delta=\left(\frac14,\frac18\right)}
+\]
+
+\subsection*{(c) Sample mean increment vector}
+
+The average observed increment is
+\[
+\bar\Delta=\frac1n\sum_{k=1}^n \Delta Z_k.
+\]
+
+The total horizontal displacement is
+\[
+N_E-N_W=6-2=4,
+\]
+and the total vertical displacement is
+\[
+N_N-N_S=5-3=2.
+\]
+
+So
+\[
+\bar\Delta
+=
+\left(
+\frac{4}{16},\frac{2}{16}
+\right)
+=
+\left(\frac14,\frac18\right).
+\]
+
+Thus
+\[
+\boxed{
+\bar\Delta=\left(\frac14,\frac18\right).
+}
+\]
+
+\paragraph{Why does this match part (b)?}
+
+Because the MLE for the drift is just the empirical average step.
+
+\subsection*{(d) Brownian motion with drift, sampled every 2 seconds}
+
+Now interpret the same path as observations from a Brownian motion with drift:
+\[
+X_t=\mu_x t + \text{noise}, \qquad
+Y_t=\mu_y t + \text{noise},
+\]
+sampled every 2 seconds.
+
+With 16 steps, the total elapsed time is
+\[
+16\times 2 = 32 \text{ seconds}.
+\]
+
+The net displacement is still
+\[
+(4,2).
+\]
+
+For Brownian motion with drift, the MLE of the drift vector is net displacement divided by total time:
+\[
+\hat\mu
+=
+\left(
+\frac{4}{32},\frac{2}{32}
+\right)
+=
+\left(\frac18,\frac1{16}\right).
+\]
+
+So
+\[
+\boxed{
+\hat\mu_x=\frac18,\qquad \hat\mu_y=\frac1{16}.
+}
+\]
+
+\subsection*{(e) Compare the two drifts}
+
+From the random-walk model, the drift per step was
+\[
+\left(\frac14,\frac18\right).
+\]
+From the Brownian-time model, the drift per second is
+\[
+\left(\frac18,\frac1{16}\right).
+\]
+
+These are not numerically identical because they use different units:
+\begin{itemize}[leftmargin=1.5em]
+    \item part (b) gives expected displacement \emph{per step},
+    \item part (d) gives expected displacement \emph{per second}.
+\end{itemize}
+
+Since each step takes 2 seconds, dividing the per-step drift by 2 gives
+\[
+\left(\frac14,\frac18\right)\div 2
+=
+\left(\frac18,\frac1{16}\right),
+\]
+which matches the Brownian estimate.
+
+\bigskip
+\noindent
+\textbf{Conclusion.}  
+The two answers are consistent once we account for the time scale.
+
+\newpage
+
+\section*{Problem 7}
+
+This problem uses a plotted 2D trajectory and asks us to approximate a discrete random-walk model and a continuous-time Brownian-drift model from the figure.
+
+Because the exact coordinates come from reading the plot, the answers are approximate.
+
+Suppose the visible trajectory is approximately
+\[
+(0,0)\to(1.5,1)\to(2.75,2)\to(4,2.75)\to(4.75,4.25)\to(5.75,3.5).
+\]
+
+Then the approximate increments are
+\[
+(1.5,1),\quad (1.25,1),\quad (1.25,0.75),\quad (0.75,1.5),\quad (1,-0.75).
+\]
+
+\subsection*{(a) Classify each increment}
+
+We classify each increment by its dominant direction:
+\begin{itemize}[leftmargin=1.5em]
+    \item $(1.5,1)$ is mostly East,
+    \item $(1.25,1)$ is mostly East,
+    \item $(1.25,0.75)$ is mostly East,
+    \item $(0.75,1.5)$ is mostly North,
+    \item $(1,-0.75)$ is mostly East.
+\end{itemize}
+
+So the approximate sequence is
+\[
+E,\ E,\ E,\ N,\ E.
+\]
+
+Hence the counts are approximately
+\[
+N_E=4,\qquad N_W=0,\qquad N_N=1,\qquad N_S=0.
+\]
+
+\[
+\boxed{
+(N_E,N_W,N_N,N_S)\approx (4,0,1,0)
+}
+\]
+
+\subsection*{(b) MLEs of the directional probabilities}
+
+There are about 5 increments total, so the multinomial MLEs are
+\[
+\hat p_E=\frac45,\qquad
+\hat p_W=0,\qquad
+\hat p_N=\frac15,\qquad
+\hat p_S=0.
+\]
+
+\[
+\boxed{
+\hat p_E\approx \frac45,\quad
+\hat p_W\approx 0,\quad
+\hat p_N\approx \frac15,\quad
+\hat p_S\approx 0
+}
+\]
+
+\subsection*{(c) Drift under the random-walk model}
+
+For the discrete random-walk model, the drift vector is
+\[
+\delta=(p_E-p_W,\ p_N-p_S).
+\]
+Plugging in the estimates:
+\[
+\hat\delta
+=
+\left(\frac45-0,\frac15-0\right)
+=
+\left(\frac45,\frac15\right).
+\]
+
+\[
+\boxed{
+\hat\delta\approx \left(\frac45,\frac15\right)
+}
+\]
+
+\subsection*{(d) Drift under the Brownian-motion model}
+
+Now approximate the path as a Brownian motion with drift observed at uneven times.
+
+Suppose the time increments are approximately
+\[
+2,\ 2.25,\ 1.75,\ 2,\ 2.25 \text{ seconds},
+\]
+so the total time is
+\[
+2+2.25+1.75+2+2.25=10.25 \text{ seconds}.
+\]
+
+The net displacement is approximately
+\[
+(5.75,3.5).
+\]
+
+For Brownian motion with drift, the drift estimate is
+\[
+\hat\mu
+=
+\frac{\text{net displacement}}{\text{total time}}
+=
+\left(\frac{5.75}{10.25},\frac{3.5}{10.25}\right).
+\]
+Numerically,
+\[
+\frac{5.75}{10.25}\approx 0.561,
+\qquad
+\frac{3.5}{10.25}\approx 0.341.
+\]
+
+So
+\[
+\boxed{
+\hat\mu\approx (0.561,\ 0.341).
+}
+\]
+
+\subsection*{(e) Predicted location after the next 2 seconds}
+
+Suppose the current location is approximately
+\[
+(5.75,3.5).
+\]
+
+\paragraph{Random-walk prediction.}
+
+If we use the random-walk drift from part (c), then one additional step would move us by about
+\[
+\left(\frac45,\frac15\right).
+\]
+So the predicted next location is
+\[
+(5.75,3.5)+\left(\frac45,\frac15\right)
+=
+(6.55,3.70).
+\]
+
+\[
+\boxed{(6.55,\,3.70)}
+\]
+
+\paragraph{Brownian-drift prediction over 2 seconds.}
+
+If the Brownian drift is
+\[
+\hat\mu\approx (0.561,0.341)
+\]
+per second, then over 2 seconds the expected displacement is
+\[
+2\hat\mu \approx (1.122,0.682).
+\]
+So the predicted location is
+\[
+(5.75,3.5)+(1.122,0.682)\approx (6.87,4.18).
+\]
+
+\[
+\boxed{(6.87,\,4.18)}
+\]
+
+\paragraph{Comment.}  
+The two predictions differ because the models are different:
+\begin{itemize}[leftmargin=1.5em]
+    \item the random-walk model uses one discrete directional step,
+    \item the Brownian model uses a continuous-time drift rate.
+\end{itemize}
+
+\newpage
+
+\section*{Problem 8}
+
+Let $(B_t)_{0\le t\le 1}$ be standard Brownian motion.
+
+We study the process conditioned on
+\[
+B_1=0,
+\]
+which is called a \textbf{Brownian bridge}.
+
+\subsection*{(a) Joint distribution of $(B_t,B_1)$}
+
+Brownian motion is a Gaussian process.
+That means any finite collection of times has a multivariate normal distribution.
+
+So $(B_t,B_1)$ is bivariate normal.
+
+\paragraph{Step 1: Compute the mean vector.}
+
+Brownian motion has mean zero:
+\[
+E[B_t]=0, \qquad E[B_1]=0.
+\]
+So the mean vector is
+\[
+\begin{bmatrix}0\\0\end{bmatrix}.
+\]
+
+\paragraph{Step 2: Compute the covariance matrix.}
+
+For Brownian motion,
+\[
+\operatorname{Cov}(B_s,B_t)=\min(s,t).
+\]
+Therefore
+\[
+\operatorname{Var}(B_t)=t,
+\qquad
+\operatorname{Var}(B_1)=1,
+\qquad
+\operatorname{Cov}(B_t,B_1)=\min(t,1)=t.
+\]
+
+So
+\[
+\boxed{
+(B_t,B_1)\sim N\left(
+\begin{bmatrix}0\\0\end{bmatrix},
+\begin{bmatrix}
+t & t\\
+t & 1
+\end{bmatrix}
+\right).
+}
+\]
+
+\subsection*{(b) Distribution of $B_t\mid B_1=0$}
+
+We use the conditional distribution formula for a multivariate normal vector.
+
+\paragraph{Step 1: Conditional mean.}
+
+For a bivariate normal pair $(X,Y)$,
+\[
+E[X\mid Y=y]
+=
+E[X]+\frac{\operatorname{Cov}(X,Y)}{\operatorname{Var}(Y)}(y-E[Y]).
+\]
+
+Here
+\[
+X=B_t,\qquad Y=B_1,\qquad y=0.
+\]
+So
+\[
+E[B_t\mid B_1=0]
+=
+0+\frac{t}{1}(0-0)=0.
+\]
+
+\paragraph{Step 2: Conditional variance.}
+
+For a bivariate normal pair,
+\[
+\operatorname{Var}(X\mid Y)
+=
+\operatorname{Var}(X)-\frac{\operatorname{Cov}(X,Y)^2}{\operatorname{Var}(Y)}.
+\]
+Thus
+\[
+\operatorname{Var}(B_t\mid B_1=0)
+=
+t-\frac{t^2}{1}
+=
+t-t^2.
+\]
+
+So
+\[
+\boxed{
+B_t\mid(B_1=0)\sim N(0,t-t^2).
+}
+\]
+
+\paragraph{Step 3: Show an equivalent representation.}
+
+Consider the process
+\[
+B_t-tB_1.
+\]
+Its mean is
+\[
+E[B_t-tB_1]=0.
+\]
+Its variance is
+\[
+\operatorname{Var}(B_t-tB_1)
+=
+\operatorname{Var}(B_t)+t^2\operatorname{Var}(B_1)-2t\,\operatorname{Cov}(B_t,B_1).
+\]
+Substitute:
+\[
+=t+t^2-2t^2
+=t-t^2.
+\]
+
+So $B_t-tB_1$ has the same one-dimensional distribution as $B_t\mid(B_1=0)$.
+In fact, one can show their finite-dimensional distributions agree, so
+\[
+\boxed{
+(B_t\mid B_1=0)_{0\le t\le1}
+\overset{d}{=}
+(B_t-tB_1)_{0\le t\le1}.
+}
+\]
+
+\subsection*{(c) Mean and covariance of the Brownian bridge}
+
+Using the representation
+\[
+X_t=B_t-tB_1,
+\]
+we can compute the mean and covariance directly.
+
+\paragraph{Mean.}
+
+\[
+E[X_t]=E[B_t-tB_1]=0.
+\]
+So the mean function is
+\[
+\boxed{m(t)=0.}
+\]
+
+\paragraph{Covariance.}
+
+For $0\le s,t\le1$,
+\[
+\operatorname{Cov}(X_s,X_t)
+=
+\operatorname{Cov}(B_s-sB_1,\ B_t-tB_1).
+\]
+Expand this:
+\[
+=
+\operatorname{Cov}(B_s,B_t)
+-
+t\,\operatorname{Cov}(B_s,B_1)
+-
+s\,\operatorname{Cov}(B_1,B_t)
++
+st\,\operatorname{Var}(B_1).
+\]
+Using Brownian covariance,
+\[
+\operatorname{Cov}(B_s,B_t)=\min(s,t),
+\qquad
+\operatorname{Cov}(B_s,B_1)=s,
+\qquad
+\operatorname{Cov}(B_t,B_1)=t,
+\qquad
+\operatorname{Var}(B_1)=1.
+\]
+So
+\[
+\operatorname{Cov}(X_s,X_t)
+=
+\min(s,t)-ts-st+st
+=
+\min(s,t)-st.
+\]
+
+Thus the Brownian bridge has covariance function
+\[
+\boxed{
+K(s,t)=\min(s,t)-st.
+}
+\]
+
+\paragraph{Final answer.}
+
+The Brownian bridge is a Gaussian process with
+\[
+\boxed{
+m(t)=0,
+\qquad
+K(s,t)=\min(s,t)-st.
+}
+\]
+
+\subsection*{(d) Drifted Brownian motion conditioned on $X_1=0$}
+
+Now let
+\[
+X_t=\mu t+\sigma B_t.
+\]
+
+We want the distribution of the process conditioned on
+\[
+X_1=0.
+\]
+
+\paragraph{Step 1: Use the condition $X_1=0$.}
+
+Since
+\[
+X_1=\mu+\sigma B_1,
+\]
+the condition $X_1=0$ implies
+\[
+B_1=-\frac{\mu}{\sigma}.
+\]
+
+Now write
+\[
+X_t=\mu t+\sigma B_t.
+\]
+Add and subtract $\sigma t B_1$:
+\[
+X_t
+=
+\mu t+\sigma(B_t-tB_1)+\sigma t B_1.
+\]
+But under the conditioning,
+\[
+\sigma t B_1=\sigma t\left(-\frac{\mu}{\sigma}\right)=-\mu t.
+\]
+So the drift terms cancel:
+\[
+X_t\mid (X_1=0)
+=
+\sigma(B_t-tB_1).
+\]
+
+Therefore
+\[
+\boxed{
+X_t\mid (X_1=0)
+\overset{d}{=}
+\sigma(B_t-tB_1).
+}
+\]
+
+\paragraph{Step 2: Compute mean and covariance.}
+
+Since $B_t-tB_1$ has mean $0$,
+\[
+E[X_t\mid X_1=0]=0.
+\]
+
+Its covariance is just scaled by $\sigma^2$:
+\[
+\operatorname{Cov}(X_s,X_t\mid X_1=0)
+=
+\sigma^2\bigl(\min(s,t)-st\bigr).
+\]
+
+So
+\[
+\boxed{
+E[X_t\mid X_1=0]=0,
+\qquad
+\operatorname{Cov}(X_s,X_t\mid X_1=0)
+=
+\sigma^2(\min(s,t)-st).
+}
+\]
+
+\paragraph{Interpretation.}  
+Conditioning a drifted Brownian motion to end at $0$ at time $1$ removes the deterministic drift in the conditional mean and leaves a scaled Brownian bridge.
+
+\end{document}

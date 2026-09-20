@@ -1,0 +1,76 @@
+name: Build PDFs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile every LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: |
+            assignments/*.tex
+            exams/*.tex
+            notes/*.tex
+            projects/*/writeup.tex
+          glob_root_file: true
+          work_in_root_file_dir: true
+          latexmk_shell_escape: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp web/index.html _site/
+          # Keep each PDF at the same relative path as its source.
+          find assignments exams notes projects -name '*.pdf' -print0 |
+            while IFS= read -r -d '' pdf; do
+              mkdir -p "_site/$(dirname "$pdf")"
+              cp "$pdf" "_site/$pdf"
+            done
+          echo "Published files:"
+          find _site -type f | sort
+
+      - name: Verify every linked PDF exists
+        run: |
+          missing=0
+          grep -o 'href="[^"]*\.pdf"' web/index.html | sed 's/href="//; s/"$//' > links.txt
+          while read -r link; do
+            if [ ! -f "_site/$link" ]; then
+              echo "::error::index.html links to $link but it was not built"
+              missing=1
+            fi
+          done < links.txt
+          rm -f links.txt
+          exit $missing
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,486 @@
+\documentclass[hidelinks]{article}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tkz-euclide}
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage{fancyhdr}
+\usepackage{tocloft} % Add this package
+\usepackage{xcolor}
+\definecolor{darkgreen}{RGB}{0,100,0}
+\usepackage{listings}
+\lstset{
+  language=R,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{red},
+  commentstyle=\color{green},
+  stringstyle=\color{green},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=5pt,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false
+}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{amsthm}
+\usepackage[shortlabels]{enumitem}
+
+
+
+% Remove dots from table of contents
+\renewcommand{\cftdot}{}
+\renewcommand{\cftsecdotsep}{\cftnodots}
+\renewcommand{\cftsubsecdotsep}{\cftnodots}
+\newcommand{\RNum}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+
+
+\renewcommand{\contentsname}{Table of Contents}
+\usetikzlibrary{angles,calc, decorations.pathreplacing}
+\definecolor{carminered}{rgb}{1.0, 0.0, 0.22}
+\definecolor{capri}{rgb}{0.0, 0.75, 1.0}
+\definecolor{brightlavender}{rgb}{0.75, 0.58, 0.89}
+
+\title{\textbf{STAT 545 HW 6}}
+\author{Andres Efren Rocha Jayasinha}
+\setcounter{secnumdepth}{0}
+\date{Updated: \today} % suppresses the printed date
+
+\begin{document}
+\hypersetup{bookmarksnumbered=true,}
+\pagecolor{white}
+\color{black}
+\maketitle
+\begin{Large}
+\tableofcontents
+\end{Large}%
+\pagebreak
+
+\section{Assignment 6: Homogeneous Poisson Processes}
+
+\subsection{Exercise 6.12}
+
+\noindent Starting at noon, diners arrive at a restaurant according to a Poisson process at the rate of five customers per minute. The time each customer spends eating at the restaurant has an exponential distribution with mean $40$ minutes, independent of other customers and independent of arrival times. Find the distribution, as well as the mean and variance, of the number of diners in the restaurant at $2$ p.m.
+
+\smallskip
+
+\noindent \textbf{Solution}
+
+\noindent Let $B_t$ denote the number of diners in the restaurant at time $t$ minutes after noon.
+Arrivals occur according to a Poisson process with rate $\lambda=5$ per minute, and the
+time spent eating by each diner is i.i.d.\ exponential with mean $40$ minutes. Thus the
+eating time $Z$ has distribution $\mathrm{Exp}(\mu)$ with $\mu=1/40$ per minute.
+
+\smallskip
+
+\noindent We want the distribution of $B_{120}$.
+
+\medskip
+
+\noindent Let $N_t$ be the number of arrivals in $[0,t]$. Then $N_t\sim\mathrm{Poisson}(\lambda t)$.
+Conditioning on $N_t$,
+\begin{align*}
+\mathbb{P}(B_t=k)
+&=\sum_{n=k}^{\infty}\mathbb{P}(B_t=k\mid N_t=n)\,\mathbb{P}(N_t=n)\\
+&=\sum_{n=k}^{\infty}\mathbb{P}(B_t=k\mid N_t=n)\,e^{-\lambda t}\frac{(\lambda t)^n}{n!}.
+\end{align*}
+
+\medskip
+\noindent Given $N_t=n$, let $U_1,\dots,U_n$ be the (unordered) arrival times in $(0,t)$.
+A standard property of the Poisson process states that conditional on $N_t=n$,
+the variables $U_1,\dots,U_n$ are i.i.d.\ $\mathrm{Uniform}(0,t)$.
+
+\smallskip
+
+\noindent Let $Z_1,\dots,Z_n$ be the i.i.d.\ eating times, independent of $U_1,\dots,U_n$.
+Diner $i$ is still in the restaurant at time $t$ iff $U_i+Z_i>t$. Hence $B_t$ equals the
+number of indices $i\in\{1,\dots,n\}$ such that $U_i+Z_i>t$.
+
+\smallskip
+
+\noindent Define the indicator $I_i=\mathbf{1}\{U_i+Z_i>t\}$. Then, given $N_t=n$,
+\[
+B_t=\sum_{i=1}^n I_i.
+\]
+Moreover, conditional on $N_t=n$, the pairs $(U_i,Z_i)$ are i.i.d., so $I_1,\dots,I_n$ are
+i.i.d.\ Bernoulli with success probability
+\[
+p=\mathbb{P}(U_1+Z_1>t).
+\]
+Therefore,
+\[
+\mathbb{P}(B_t=k\mid N_t=n)=\binom{n}{k}p^k(1-p)^{n-k}.
+\]
+
+\medskip
+\noindent Since $U_1\sim \mathrm{Uniform}(0,t)$ and is independent of $Z_1$,
+\begin{align*}
+p
+&=\mathbb{P}(U_1+Z_1>t)
+=\frac{1}{t}\int_0^t \mathbb{P}(Z_1>t-x)\,dx.
+\end{align*}
+Here $Z_1\sim\mathrm{Exp}(\mu)$, so $\mathbb{P}(Z_1>y)=e^{-\mu y}$ for $y\ge 0$. Thus
+\begin{align*}
+p
+&=\frac{1}{t}\int_0^t e^{-\mu(t-x)}\,dx
+=\frac{1}{t}\int_0^t e^{-\mu u}\,du
+=\frac{1-e^{-\mu t}}{\mu t}.
+\end{align*}
+
+\medskip
+\noindent Substituting $\mathbb{P}(B_t=k\mid N_t=n)$ into the conditioning sum gives
+\begin{align*}
+\mathbb{P}(B_t=k)
+&=\sum_{n=k}^{\infty}\binom{n}{k}p^k(1-p)^{n-k}e^{-\lambda t}\frac{(\lambda t)^n}{n!}\\
+&=e^{-\lambda t}\frac{p^k(\lambda t)^k}{k!}
+\sum_{n=k}^{\infty}\frac{\bigl((1-p)\lambda t\bigr)^{n-k}}{(n-k)!}\\
+&=e^{-\lambda t}\frac{(p\lambda t)^k}{k!}\exp\!\bigl((1-p)\lambda t\bigr)\\
+&=e^{-p\lambda t}\frac{(p\lambda t)^k}{k!},\qquad k=0,1,2,\dots
+\end{align*}
+Hence
+\[
+B_t\sim \mathrm{Poisson}(p\lambda t).
+\]
+Using $p=\dfrac{1-e^{-\mu t}}{\mu t}$, we get
+\[
+p\lambda t=\lambda\frac{1-e^{-\mu t}}{\mu}.
+\]
+
+\medskip
+\noindent With $\lambda=5$, $\mu=1/40$, and $t=120$,
+\[
+p\lambda t=\frac{5}{1/40}\left(1-e^{-(1/40)\cdot 120}\right)=200(1-e^{-3}).
+\]
+Therefore,
+\[
+B_{120}\sim \mathrm{Poisson}\!\left(200(1-e^{-3})\right).
+\]
+For a Poisson$(\theta)$ random variable, $\mathbb{E}[B_{120}]=\mathrm{Var}(B_{120})=\theta$, so
+\[
+\mathbb{E}[B_{120}]=200(1-e^{-3}),
+\qquad
+\mathrm{Var}(B_{120})=200(1-e^{-3}).
+\]
+
+\subsection{Exercise 6.23}
+
+\noindent Oak and maple trees are each located in the arboretum according to independent spatial Poisson processes with parameters $\lambda_O$ and $\lambda_M$, respectively.
+
+\begin{enumerate}
+    \item[(a)] In a region of $x$ square meters, find the probability that both species of trees are present.
+    
+    \item[(b)] In the arboretum, there is a circular pond of radius $100$ m. Find the probability that within $20$ m of the pond there are only oaks.
+\end{enumerate}
+
+{\color{darkgreen}
+
+\noindent \textbf{Spatial Poisson Process}
+
+\noindent A collection of random variables $(N_A)_{A \subseteq \mathbb{R}^d}$ is a spatial Poisson process with parameter $\lambda$ if
+
+\begin{enumerate}
+    \item For each bounded set $A \subseteq \mathbb{R}^d$, $N_A$ has a Poisson distribution with parameter $\lambda |A|$.
+    
+    \item Whenever $A$ and $B$ are disjoint sets, $N_A$ and $N_B$ are independent random variables.
+\end{enumerate}
+}
+
+\noindent \textbf{Solution}
+
+\noindent Part A:
+
+\noindent Let $N_O$ be the number of oak trees and $N_M$ be the number of maple trees in a region of area $x$ (square meters).
+Since the locations follow independent spatial Poisson processes with intensities $\lambda_O$ and $\lambda_M$,
+\[
+N_O \sim \mathrm{Poisson}(\lambda_O x), 
+\qquad
+N_M \sim \mathrm{Poisson}(\lambda_M x),
+\]
+and $N_O$ and $N_M$ are independent.
+
+\noindent The event that \emph{both} species are present is
+\[
+\{N_O \ge 1,\; N_M \ge 1\}.
+\]
+Using complements and independence,
+
+\[
+P(O_x \ge 1,\, M_x \ge 1)
+= P(O_x \ge 1)\, P(M_x \ge 1)
+= (1 - P(O_x = 0))(1 - P(M_x = 0))
+= (1 - e^{-\lambda_O x})(1 - e^{-\lambda_M x}).
+\]
+
+\noindent Part B:
+
+\noindent Let $A$ be the region consisting of all points within $20$ m of the pond.
+Since the pond has radius $100$ m, $A$ is an annulus with inner radius $100$ and outer radius $120$, so
+\[
+|A|=\pi(120^2-100^2).
+\]
+Let $O_A$ and $M_A$ denote the numbers of oaks and maples in $A$. By the spatial Poisson assumptions,
+\[
+O_A \sim \text{Poisson}(\lambda_O |A|), 
+\qquad
+M_A \sim \text{Poisson}(\lambda_M |A|),
+\]
+and $O_A$ and $M_A$ are independent.
+
+\noindent The event ``within $20$ m of the pond there are only oaks'' means there are no maples in $A$, i.e. $\{M_A=0\}$.
+Thus,
+
+\[
+P(O_R \ge 1,\; M_R = 0)
+= P(O_R \ge 1)\,P(M_R=0)
+= \bigl(1-e^{-\lambda_O 4400\pi}\bigr)e^{-\lambda_M 4400\pi}.
+\]
+
+\subsection{Exercise 6.35}
+
+\noindent See the definitions for the spatial and nonhomogeneous Poisson processes.
+Define a nonhomogeneous, spatial Poisson process in $\mathbb{R}^2$.
+Consider such a process $(N_A)_{A \subseteq \mathbb{R}^2}$ with intensity function
+\[
+\lambda(x,y) = e^{-(x^2+y^2)}, 
+\qquad -\infty < x,y < \infty.
+\]
+
+\noindent Let $C$ denote the unit circle, that is, the circle of radius $1$ centered at the origin.
+Find $P(N_C = 0)$.
+
+{\color{darkgreen}
+
+\noindent \textbf{Nonhomogeneous Poisson Process}
+
+\noindent A counting process $(N_t)_{t \ge 0}$ is a nonhomogeneous Poisson process with
+intensity function $\lambda(t)$, if
+
+\begin{enumerate}
+    \item $N_0 = 0$.
+    
+    \item For all $t > 0$, $N_t$ has a Poisson distribution with mean
+    \[
+    \mathbb{E}(N_t) = \int_0^t \lambda(x)\,dx.
+    \]
+    
+    \item For $0 \le q < r \le s < t$, 
+    $N_r - N_q$ and $N_t - N_s$ are independent random variables.
+\end{enumerate}
+
+}
+
+\noindent \textbf{Solution}
+
+\noindent For a nonhomogeneous spatial Poisson process with intensity function
+$\lambda(x,y)$, the number of points in a region $A$ has a Poisson
+distribution with parameter
+\[
+\int\!\!\!\int_A \lambda(x,y)\,dx\,dy.
+\]
+Hence,
+\[
+P(N_A = 0)
+= \exp\!\left(-\int\!\!\!\int_A \lambda(x,y)\,dx\,dy\right).
+\]
+
+\noindent In our problem, $C$ is the unit disk centered at the origin and
+\[
+\lambda(x,y)=e^{-(x^2+y^2)}.
+\]
+Therefore,
+\[
+P(N_C = 0)
+=
+\exp\!\left(-\int\!\!\!\int_C e^{-(x^2+y^2)}\,dx\,dy\right).
+\]
+
+\medskip
+
+\noindent Since the region $C$ is a disk and the intensity depends only on
+$x^2+y^2$, we switch to polar coordinates:
+\[
+x=r\cos\theta, \qquad y=r\sin\theta,
+\]
+with Jacobian determinant $r$.  On the unit disk,
+\[
+0 \le r \le 1, \qquad 0 \le \theta \le 2\pi.
+\]
+
+\noindent Thus,
+\begin{align*}
+\int\!\!\!\int_C e^{-(x^2+y^2)}\,dx\,dy
+&=
+\int_0^{2\pi} \int_0^1 e^{-r^2}\, r\,dr\,d\theta.
+\end{align*}
+
+\noindent First integrate with respect to $r$.  Let
+\[
+u = r^2, \qquad du = 2r\,dr,
+\]
+so that $r\,dr = \tfrac12 du$.  When $r=0$, $u=0$;
+when $r=1$, $u=1$.  Hence,
+\begin{align*}
+\int_0^1 e^{-r^2} r\,dr
+&=
+\frac12 \int_0^1 e^{-u}\,du \\
+&=
+\frac12 \bigl(1 - e^{-1}\bigr).
+\end{align*}
+
+\noindent Now integrate with respect to $\theta$:
+\begin{align*}
+\int_0^{2\pi} \int_0^1 e^{-r^2} r\,dr\,d\theta
+&=
+\int_0^{2\pi} \frac12 (1-e^{-1})\, d\theta \\
+&=
+2\pi \cdot \frac12 (1-e^{-1}) \\
+&=
+\pi (1-e^{-1}).
+\end{align*}
+
+\medskip
+
+\noindent Therefore,
+\[
+P(N_C = 0)
+=
+\exp\!\bigl(-\pi(1-e^{-1})\bigr).
+\]
+
+\subsection{Exercise 6.41}
+
+\noindent Goals occur in a soccer game according to a Poisson process. 
+The average total number of goals scored for a 90-minute match is 2.68. 
+Assume that two teams are evenly matched. Use simulation to estimate the 
+probability both teams will score the same number of goals. Compare with 
+the theoretical result.
+
+\noindent \textbf{Solution}
+
+\noindent Since the total number of goals in 90 minutes follows a Poisson process 
+with mean $2.68$, and the teams are evenly matched, each team’s number 
+of goals is an independent Poisson random variable with mean $2.68/2 = 1.34$.
+
+\noindent Let $X$ and $Y$ denote the number of goals scored by the two teams. Then
+\[
+X, Y \sim \text{Poisson}(1.34),
+\quad \text{independently}.
+\]
+
+\noindent The probability that both teams score the same number of goals is
+\[
+P(X = Y)
+=
+\sum_{k=0}^{\infty}
+P(X = k) P(Y = k)
+=
+\sum_{k=0}^{\infty}
+\left(
+\frac{e^{-1.34} 1.34^k}{k!}
+\right)^2.
+\]
+
+\noindent Evaluating this sum gives
+\[
+P(X = Y) \approx 0.259.
+\]
+
+\noindent Thus, theoretically, the probability that both teams score the same 
+number of goals is approximately $0.259$.
+
+\noindent \textbf{Input:}
+
+\begin{lstlisting}[caption={Poisson Soccer Simulation}]
+trials <- 100000
+mean(rpois(trials,1.34)==rpois(trials,1.34))
+\end{lstlisting}
+
+\noindent \textbf{Output:} We get .25812
+
+\noindent \subsection{Exercise 6.42}
+Simulate the restaurant results of Exercise 6.12.
+
+\noindent \textbf{Solution}
+
+\noindent \textbf{Input:}
+
+\begin{lstlisting}[caption={South Carolina Swamp Forest}]
+trials <- 10000
+sim <- numeric(trials)
+for (i in 1:trials) {
+    cust <- rpois(1,5*60*2) # no. of customers in 2 hours
+    arr <- sort(runif(cust,0,120))
+    times <- arr + rexp(cust,1/40)
+    sim[i] <- sum (times > 120) # no of customers at 2 pm
+}
+
+mean(sim)
+
+var(sim)
+\end{lstlisting}
+
+\noindent \textbf{Output:} Mean of 190.1929 and Variance of 192.4839
+
+\subsection{Exercise 6.43}
+
+\noindent Simulate a spatial Poisson process with $\lambda = 10$ 
+on the box of volume $8$ with vertices at the eight points 
+$(\pm 1, \pm 1, \pm 1)$. Estimate the mean and variance of the number 
+of points in the ball centered at the origin of radius $1$. 
+Compare with the exact values.
+
+\noindent \textbf{Solution}
+
+\noindent For a spatial Poisson process with intensity $\lambda = 10$ per unit volume,
+the number of points in any region $A$ follows a Poisson distribution with
+mean
+\[
+\lambda \, |A|.
+\]
+
+\noindent The ball of radius $1$ has volume
+\[
+|A| = \frac{4}{3}\pi (1)^3 = \frac{4}{3}\pi.
+\]
+
+\noindent Hence the theoretical mean (and variance) of the number of points in the ball is
+\[
+10 \cdot \frac{4}{3}\pi = \frac{40\pi}{3} \approx 41.89.
+\]
+
+\noindent Thus, the exact distribution is
+\[
+N \sim \text{Poisson}\!\left(\frac{40\pi}{3}\right),
+\]
+so both the mean and variance equal $\frac{40\pi}{3} \approx 41.89$.
+
+\noindent \textbf{Input:}
+
+\begin{lstlisting}[caption={Exercise 6.43}]
+trials <- 10000
+sim <- numeric(trials)
+
+for (k in 1:trials) {
+  
+  npoints <- rpois(1, lambda = 10 * 8)
+  
+  points <- matrix(runif(npoints * 3, -1, 1), ncol = 3)
+  
+  sim[k] <- sum(rowSums(points^2) < 1)
+}
+
+mean(sim)
+var(sim)
+\end{lstlisting}
+
+\noindent \textbf{Output:} Mean of 41.9851 and Standard Deviation of 42.03528.
+
+\end{document}

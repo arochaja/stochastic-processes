@@ -1,0 +1,640 @@
+\documentclass[hidelinks]{article}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tkz-euclide}
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage{fancyhdr}
+\usepackage{tocloft} % Add this package
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+  language=R,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{red},
+  commentstyle=\color{green},
+  stringstyle=\color{green},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=5pt,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false
+}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{amsthm}
+\usepackage[shortlabels]{enumitem}
+
+
+
+% Remove dots from table of contents
+\renewcommand{\cftdot}{}
+\renewcommand{\cftsecdotsep}{\cftnodots}
+\renewcommand{\cftsubsecdotsep}{\cftnodots}
+\newcommand{\RNum}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+
+
+\renewcommand{\contentsname}{Table of Contents}
+\usetikzlibrary{angles,calc, decorations.pathreplacing}
+\definecolor{carminered}{rgb}{1.0, 0.0, 0.22}
+\definecolor{capri}{rgb}{0.0, 0.75, 1.0}
+\definecolor{brightlavender}{rgb}{0.75, 0.58, 0.89}
+
+\title{\textbf{STAT 545 HW 1}}
+\author{Andres Efren Rocha Jayasinha}
+\setcounter{secnumdepth}{0}
+\date{Updated: \today} % suppresses the printed date
+
+\begin{document}
+\hypersetup{bookmarksnumbered=true,}
+\pagecolor{white}
+\color{black}
+\maketitle
+\begin{Large}
+\tableofcontents
+\end{Large}%
+\pagebreak
+
+\section{Assignment 1: Introduction to Markov Chains}
+
+\subsection{Exercise 2.1}
+A Markov chain has transition matrix
+\[
+P=
+\begin{pmatrix}
+0.1 & 0.3 & 0.6\\
+0   & 0.4 & 0.6\\
+0.3 & 0.2 & 0.5
+\end{pmatrix},
+\]
+with initial distribution $\alpha=(0.2,\,0.3,\,0.5)$. Find the following:
+\begin{enumerate}
+  \item[(a)] $P(X_7=3 \mid X_6=2)$
+  \item[(b)] $P(X_9=2 \mid X_1=2,\; X_5=1,\; X_7=3)$
+  \item[(c)] $P(X_0=3 \mid X_1=1)$
+  \item[(d)] $E(X_2)$
+\end{enumerate}
+
+\noindent {\color{green} \textbf{Stochastic Process.}
+A \emph{stochastic process} is a collection of random variables
+$\{X_t : t \in I\}$.
+The set $I$ is called the \emph{index set} of the process.
+The random variables are defined on a common \emph{state space} $S$.
+}
+
+\medskip
+
+\noindent {\color{green} \textbf{Markov Chain.}
+Let $S$ be a discrete set. A \emph{Markov chain} is a sequence of random variables
+$X_0, X_1, \ldots$ taking values in $S$ with the property that
+\[
+P(X_{n+1} = j \mid X_0 = x_0, \ldots, X_{n-1} = x_{n-1}, X_n = i)
+= P(X_{n+1} = j \mid X_n = i),
+\]
+for all $x_0, \ldots, x_{n-1}, i, j \in S$ and all $n \ge 0$.
+The set $S$ is called the \emph{state space} of the Markov chain.
+
+
+\smallskip
+
+\noindent A Markov chain is said to be \emph{time-homogeneous} if the transition
+probabilities do not depend on $n$, that is,
+\[
+P(X_{n+1} = j \mid X_n = i) = P(X_1 = j \mid X_0 = i),
+\quad \text{for all } i,j \in S \text{ and } n \ge 0.
+\]
+}
+
+\medskip
+
+\noindent{\color{green} \textbf{Bayes.} Let $A_1, A_2, \ldots, A_k$ be events such that $P(A_i) > 0$, $i = 1, 2, \ldots, k$. 
+Assume further that $A_1, A_2, \ldots, A_k$ form a partition of the sample space $\mathcal{C}$. 
+Let $B$ be any event. Then
+\[
+P(A_j \mid B) = \frac{P(A_j) P(B \mid A_j)}{\sum_{i=1}^k P(A_i) P(B \mid A_i)}, \tag{1.4.3}
+\]
+}
+
+
+\noindent{\color{green} \textbf{Law of Total Probability.}
+Let $A_1,A_2,\dots,A_k$ be events such that $P(A_i)>0$ for $i=1,2,\dots,k$, and assume $A_1,\dots,A_k$ form a partition of the sample space $\mathcal{C}$. 
+Then for any event $B$,
+\[
+P(B)=\sum_{i=1}^k P(A_i)P(B\mid A_i). 
+\]
+}
+
+\noindent \textbf{Solution}
+
+\paragraph{(a)}
+For a time-homogeneous Markov chain,
+\[
+P(X_{n+1}=j \mid X_n=i)=p_{ij}.
+\]
+Therefore,
+\[
+P(X_7=3 \mid X_6=2)=p_{2,3}.
+\]
+From the transition matrix, the entry in row $2$ and column $3$ is $0.6$. Hence,
+\[
+\boxed{P(X_7=3 \mid X_6=2)=0.6.}
+\]
+
+\paragraph{(b)}
+By the Markov property, conditioning on $X_7$ makes the earlier states $X_1$ and $X_5$ irrelevant. Thus,
+\[
+P(X_9=2 \mid X_1=2,\; X_5=1,\; X_7=3)
+= P(X_9=2 \mid X_7=3).
+\]
+
+\noindent Using the law of total probability and conditioning on the possible values of $X_8$,
+\[
+P(X_9=2 \mid X_7=3)
+= \sum_{j=1}^3 P(X_9=2 \mid X_8=j,\; X_7=3)\,P(X_8=j \mid X_7=3).
+\]
+
+\noindent By the Markov property,
+
+\[
+P(X_9=2 \mid X_8=j,\; X_7=3)=P(X_9=2 \mid X_8=j)=p_{j2},
+\]
+
+\noindent and
+
+\[
+P(X_8=j \mid X_7=3)=p_{3j}.
+\]
+
+\noindent Therefore,
+
+\[
+P(X_9=2 \mid X_7=3)
+= \sum_{j=1}^3 p_{3j}p_{j2}.
+\]
+
+\noindent Substituting the values from the transition matrix (or multiply second column by third row),
+
+\[
+=0.3(0.3)+0.2(0.4)+0.5(0.2)
+=0.09+0.08+0.10
+=0.27.
+\]
+
+\noindent Hence,
+
+\[
+\boxed{P(X_9=2 \mid X_1=2,\; X_5=1,\; X_7=3)=0.27.}
+\]
+
+\paragraph{(c)}
+We want $P(X_0=3 \mid X_1=1)$. By Bayes' rule,
+\[
+P(X_0=3 \mid X_1=1)=\frac{P(X_1=1 \mid X_0=3)\,P(X_0=3)}{P(X_1=1)}.
+\]
+From the initial distribution $\alpha=(0.2,0.3,0.5)$, we have $P(X_0=3)=0.5$.
+Also, from the transition matrix,
+\[
+P(X_1=1 \mid X_0=3)=p_{3,1}=0.3.
+\]
+Next,
+\[
+P(X_1=1)=\sum_{i=1}^3 P(X_1=1 \mid X_0=i)\,P(X_0=i)
+=\sum_{i=1}^3 p_{i1}\,\alpha_i.
+\]
+Using column 1 of $P$, $(p_{11},p_{21},p_{31})=(0.1,0,0.3)$, we get
+\[
+P(X_1=1)=0.1(0.2)+0(0.3)+0.3(0.5)=0.02+0+0.15=0.17.
+\]
+Therefore,
+\[
+P(X_0=3 \mid X_1=1)=\frac{0.3\cdot 0.5}{0.17}=\frac{0.15}{0.17}
+=\frac{15}{17}\approx 0.88235.
+\]
+\[
+\boxed{P(X_0=3 \mid X_1=1)=\frac{15}{17}\approx 0.88235.}
+\]
+
+\paragraph{(d)}
+
+To compute $E(X_2)$, first find the distribution of $X_2$.
+Since the initial distribution is $\alpha=(0.2,0.3,0.5)$, we have
+\[
+\mathbb{P}(X_2=\cdot)=\alpha P^2.
+\]
+
+\noindent Compute
+
+\[
+P^2=
+\begin{pmatrix}
+0.19 & 0.27 & 0.54\\
+0.18 & 0.28 & 0.54\\
+0.18 & 0.27 & 0.55
+\end{pmatrix}.
+\]
+
+\noindent Therefore,
+
+\[
+\alpha P^2
+=
+(0.2,0.3,0.5)
+\begin{pmatrix}
+0.19 & 0.27 & 0.54\\
+0.18 & 0.28 & 0.54\\
+0.18 & 0.27 & 0.55
+\end{pmatrix}
+=
+(0.182,\;0.273,\;0.545).
+\]
+
+\noindent So
+
+\[
+\mathbb{P}(X_2=1)=0.182,\qquad \mathbb{P}(X_2=2)=0.273,\qquad \mathbb{P}(X_2=3)=0.545.
+\]
+
+\noindent Finally,
+
+\[
+E(X_2)=\sum_{k=1}^3 k\,\mathbb{P}(X_2=k)
+=1(0.182)+2(0.273)+3(0.545)
+=0.182+0.546+1.635
+=2.363.
+\]
+\[
+\boxed{E(X_2)=2.363.}
+\]
+
+\subsection{Exercise 2.9} 
+
+Give the transition matrix for the transition graph in Figure 2.11
+
+\begin{tikzpicture}[
+  >=Stealth,
+  node/.style={circle, draw, thick, minimum size=9mm, inner sep=0pt, font=\itshape},
+  lab/.style={font=\small},
+  edge/.style={->, thick}
+]
+
+% Nodes (hand-placed to resemble the figure)
+\node[node] (a) at (0,0) {$a$};
+\node[node] (b) at (2,2.3) {$b$};
+\node[node] (c) at (4,0) {$c$};
+\node[node] (e) at (1,-2.0) {$e$};
+\node[node] (d) at (3,-2.0) {$d$};
+
+% Edges
+\draw[edge] (b) -- node[lab, midway, above left] {$1$} (a);
+
+\draw[edge] (a) -- node[lab, midway, above] {$3$} (c);
+
+\draw[edge] (c) -- node[lab, midway, above right] {$2$} (b);
+
+\draw[edge] (c) -- node[lab, midway, right] {$1$} (d);
+
+\draw[edge] (b) -- node[lab, midway, left] {$4$} (e);
+
+\draw[edge] (d) -- node[lab, midway, right] {$5$} (b);
+
+\draw[edge] (e) -- node[lab, midway, below] {$2$} (d);
+
+% Curved pair between a and e
+\draw[edge, bend left=25] (a) to node[lab, midway, left] {$2$} (e);
+\draw[edge, bend left=25] (e) to node[lab, midway, left] {$6$} (a);
+
+% Self-loops
+\draw[edge] (b) edge[loop above] node[lab] {$2$} (b);
+\draw[edge] (c) edge[loop right] node[lab] {$6$} (c);
+
+\end{tikzpicture}
+
+\noindent \textbf{Solution}
+
+% States ordered as (a,b,c,d,e).
+% Read weights from the graph:
+% a->c:3, a->e:2
+% b->a:1, b->b:2, b->e:4
+% c->b:2, c->c:6, c->d:1
+% d->b:5
+% e->a:6, e->d:2
+
+\[
+\textbf{Outgoing totals:}\quad
+\begin{aligned}
+&\deg^+(a)=3+2=5, \qquad
+\deg^+(b)=1+2+4=7,\\
+&\deg^+(c)=2+6+1=9, \qquad
+\deg^+(d)=5, \qquad
+\deg^+(e)=6+2=8.
+\end{aligned}
+\]
+
+
+\[
+\textbf{Transition probabilities:}\quad
+P_{ij}=\frac{w(i\to j)}{\sum_{k} w(i\to k)}.
+\]
+
+\[
+\implies \textbf{Transition matrix }P\text{ (order }(a,b,c,d,e)\text{):}\quad
+P=
+\begin{pmatrix}
+0 & 0 & \frac{3}{5} & 0 & \frac{2}{5} \\[6pt]
+\frac{1}{7} & \frac{2}{7} & 0 & 0 & \frac{4}{7} \\[6pt]
+0 & \frac{2}{9} & \frac{2}{3} & \frac{1}{9} & 0 \\[6pt]
+0 & 1 & 0 & 0 & 0 \\[6pt]
+\frac{3}{4} & 0 & 0 & \frac{1}{4} & 0
+\end{pmatrix}
+\]
+
+\subsection{Exercise 2.10} Consider a Markov chain with transition matrix
+\[
+P=
+\begin{array}{c|cccc}
+ & a & b & c & d\\ \hline
+a & 0   & \frac{3}{5} & \frac{1}{5} & \frac{1}{5}\\
+b & \frac{3}{4} & 0   & \frac{1}{4} & 0\\
+c & \frac{1}{4} & \frac{1}{4} & \frac{1}{4} & \frac{1}{4}\\
+d & \frac{1}{4} & 0   & \frac{1}{4} & \frac{1}{2}
+\end{array}
+\]
+
+\begin{enumerate}
+  \item[(a)] Exhibit the directed, weighted transition graph for the chain.
+  \item[(b)] The transition graph for this chain can be given as a weighted graph without
+  directed edges. Exhibit the graph.
+\end{enumerate}
+
+\noindent \textbf{Solution}
+
+\paragraph{(a)}
+
+\begin{center}
+\begin{tikzpicture}[
+  >=Stealth,
+  node/.style={circle, draw, thick, minimum size=10mm, inner sep=0pt, font=\itshape},
+  lab/.style={font=\small},
+  edge/.style={->, thick}
+]
+
+% Nodes (spread out)
+\node[node] (a) at (0,4) {$a$};
+\node[node] (b) at (-4,0) {$b$};
+\node[node] (c) at (0,0) {$c$};
+\node[node] (d) at (4,0) {$d$};
+
+% Edges from a
+\draw[edge] (a) to[bend left=15] node[lab, midway, left] {$\frac{3}{5}$} (b);
+\draw[edge] (a) -- node[lab, midway, right] {$\frac{1}{5}$} (c);
+\draw[edge] (a) to[bend left=15] node[lab, midway, right] {$\frac{1}{5}$} (d);
+
+% Edges from b
+\draw[edge] (b) to[bend left=20] node[lab, midway, above] {$\frac{3}{4}$} (a);
+\draw[edge] (b) -- node[lab, midway, above] {$\frac{1}{4}$} (c);
+
+% Edges from c
+\draw[edge] (c) -- node[lab, midway, above] {$\frac{1}{4}$} (b);
+\draw[edge] (c) -- node[lab, midway, above] {$\frac{1}{4}$} (d);
+\draw[edge] (c) to[bend left=25] node[lab, midway, left] {$\frac{1}{4}$} (a);
+\draw[edge] (c) edge[loop below] node[lab] {$\frac{1}{4}$} (c);
+
+% Edges from d
+\draw[edge] (d) to[bend left=25] node[lab, midway, above] {$\frac{1}{4}$} (a);
+\draw[edge] (d) -- node[lab, midway, below] {} (c);
+\draw[edge] (d) edge[loop right] node[lab] {$\frac{1}{2}$} (d);
+
+\end{tikzpicture}
+\end{center}
+
+\paragraph{(b)}
+
+\begin{center}
+\begin{tikzpicture}[
+  node/.style={circle, draw, thick, minimum size=9mm, inner sep=0pt},
+  lab/.style={font=\small}
+]
+
+% Nodes
+\node[node] (a) at (0,3) {$a$};
+\node[node] (b) at (-2,1) {$b$};
+\node[node] (c) at (0,-1) {$c$};
+\node[node] (d) at (2,1) {$d$};
+
+% Undirected edges
+\draw (a) -- node[lab, midway, left] {$3$} (b);
+\draw (b) -- node[lab, midway, left] {$1$} (c);
+\draw (c) -- node[lab, midway, right] {$1$} (d);
+\draw (d) -- node[lab, midway, right] {$1$} (a);
+\draw (a) -- node[lab, midway, right] {$1$} (c);
+
+% Loops
+\draw (c) edge[loop below] node[lab] {$1$} (c);
+\draw (d) edge[loop right] node[lab] {$2$} (d);
+
+\end{tikzpicture}
+\end{center}
+
+\subsection{Exercise 2.16} Assume that \(P\) is a stochastic matrix with equal rows.
+Show that
+
+\[
+P^{n} = P,
+\qquad \text{for all } n \ge 1.
+\]
+
+\noindent{\color{green} \textbf{(Stochastic Matrix).}
+A stochastic matrix is a square matrix \(P\) such that:
+\begin{enumerate}
+  \item \(P_{ij} \ge 0\) for all \(i,j\).
+  \item For each row \(i\),
+  \[
+  \sum_{j} P_{ij} = 1.
+  \]
+\end{enumerate}
+}
+
+\noindent \textbf{Solution}
+
+\smallskip
+
+\noindent Assume that \(P\) is a stochastic matrix whose rows are all equal. Let
+\(r^{T}\) denote this common row, so that \(P_{ij}=r_j\) for all \(i,j\).
+Since \(P\) is stochastic, the entries of \(r\) satisfy
+\[
+\sum_{k} r_k = 1.
+\]
+
+\noindent We will prove by induction for \(n\ge 1\) that \(P^{n}=P\).
+
+\medskip
+
+\noindent \textbf{Base case (\(n=1\)):}
+Clearly,
+\[
+P^{1}=P.
+\]
+
+\medskip
+
+\noindent \textbf{Inductive hypothesis:}
+Assume that for some \(k\ge 1\),
+\[
+P^{k}=P.
+\]
+
+\medskip
+
+\noindent \textbf{Inductive step:}
+Using the inductive hypothesis,
+\[
+P^{k+1}=P^{k}P=PP=P^{2}.
+\]
+If we  now show that \(P^{2}=P\), then the proof is complete. For any \(i,j\),
+\[
+(P^{2})_{ij}=\sum_{m} P_{im}P_{mj}
+=\sum_{m} r_m r_j
+=r_j \sum_{m} r_m
+=r_j
+=P_{ij},
+\]
+where we used the fact that \(\sum_{m} r_m=1\).
+Thus \(P^{2}=P\), and hence
+\[
+P^{k+1}=P.
+\]
+
+\medskip
+
+\noindent By mathematical induction,
+\[
+P^{n}=P \qquad \text{for all } n\ge 1.
+\]
+
+\subsection{Exercise 2.27}
+
+\textbf{R:} See \texttt{gamblersruin.R}. Simulate gambler's ruin for a gambler
+with initial stake \$2, playing a fair game.
+\begin{enumerate}
+  \item[(a)] Estimate the probability that the gambler is ruined before he wins \$5.
+  \item[(b)] Construct the transition matrix for the associated Markov chain.
+  Estimate the desired probability in (a) by taking high matrix powers.
+  \item[(c)] Compare your results with the exact probability.
+\end{enumerate}
+
+\noindent \textbf{Solution}
+
+\paragraph{(a)}\mbox{}\\
+\noindent\textbf{Input:}
+
+\begin{lstlisting}[caption={Gambler's Ruin Simulation in R}]
+# gamblersruin.R
+# Example 1.11
+
+# gamble(k, n, p)
+#   k: Gambler's initial state
+#   n: Gambler plays until either n or Ruin
+#   p: Probability of winning $1 at each play
+#   Function returns 1 if gambler is eventually ruined
+#                    returns 0 if gambler eventually wins n
+
+gamble <- function(k, n, p) {
+  stake <- k
+  while (stake > 0 & stake < n) {
+    bet <- sample(c(-1, 1), 1, prob = c(1 - p, p))
+    stake <- stake + bet
+  }
+  if (stake == 0) return(1) else return(0)
+}
+
+k <- 2
+n <- 40
+p <- 1/2
+trials <- 1000
+
+simlist <- replicate(trials, gamble(k, n, p))
+mean(simlist)  # Estimate of probability that gambler is ruined
+
+# For p = 0.5, exact probability is (n - k) / n
+\end{lstlisting}
+
+
+\noindent\textbf{Output:} \textit{Estimated {Probability of Ruin}} = \(\boxed{0.952}\)
+
+\paragraph{(b)}\mbox{}\\
+\noindent\textbf{Input:}
+
+\begin{lstlisting}[caption={Gambler's Ruin Simulation in R}]
+k <- 2
+n <- 40
+p <- 1/2
+q <- 1 - p
+
+P <- matrix(0, n+1, n+1)
+
+# absorbing states
+P[1,1] <- 1           # state 0
+P[n+1, n+1] <- 1      # state n
+
+# interior transitions
+for (i in 1:(n-1)) {
+  P[i+1, i]   <- q    # from i to i-1
+  P[i+1, i+2] <- p    # from i to i+1
+}
+
+# high power
+t <- 2000
+Pt <- diag(n+1)
+for (j in 1:t) Pt <- Pt %*% P
+
+ruin_prob_est <- Pt[k+1, 1]     # (P^t)_{k,0}
+win_prob_est  <- Pt[k+1, n+1]   # (P^t)_{k,n}
+
+ruin_prob_est
+win_prob_est
+ruin_prob_est + win_prob_est    # should be ~1
+\end{lstlisting}
+
+
+\noindent\textbf{Output:} \textit{Estimated {Probability of Ruin}} = \(\boxed{0.949}\)
+
+\smallskip
+
+\noindent \textit{\textbf{Note that the transition matrix P is,}}
+
+\[
+P =
+\begin{pmatrix}
+1      & 0      & 0      & 0      & \cdots & 0      & 0 \\
+q      & 0      & p      & 0      & \cdots & 0      & 0 \\
+0      & q      & 0      & p      & \cdots & 0      & 0 \\
+\vdots & \ddots & \ddots & \ddots & \ddots & \vdots & \vdots \\
+0      & \cdots & 0      & q      & 0      & p      & 0 \\
+0      & \cdots & 0      & 0      & q      & 0      & p \\
+0      & 0      & 0      & 0      & \cdots & 0      & 1
+\end{pmatrix}
+\]
+
+\noindent \textit{\textbf{with p = $\frac{1}{2}$} and q = $\frac{1}{2}$}
+
+\paragraph{(c)} From \textbf{gamblersruin.R} we have,
+
+\[
+\textit{Exact Probability of Ruin} = \frac{n-k}{n}
+\]
+
+\[
+\implies \textit{Exact Probability of Ruin} = \frac{40-2}{40} = \boxed{0.95}
+\]
+
+\noindent Given that the estimated probabilities of ruin were 0.952, 0.949, they match up nicely with the exact probability of ruin, that being 0.95.
+
+\end{document}

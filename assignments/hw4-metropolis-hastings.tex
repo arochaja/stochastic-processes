@@ -1,0 +1,425 @@
+\documentclass[hidelinks]{article}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tkz-euclide}
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage{fancyhdr}
+\usepackage{tocloft} % Add this package
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+  language=R,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{red},
+  commentstyle=\color{green},
+  stringstyle=\color{green},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=5pt,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false
+}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{amsthm}
+\usepackage[shortlabels]{enumitem}
+
+
+
+% Remove dots from table of contents
+\renewcommand{\cftdot}{}
+\renewcommand{\cftsecdotsep}{\cftnodots}
+\renewcommand{\cftsubsecdotsep}{\cftnodots}
+\newcommand{\RNum}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+
+
+\renewcommand{\contentsname}{Table of Contents}
+\usetikzlibrary{angles,calc, decorations.pathreplacing}
+\definecolor{carminered}{rgb}{1.0, 0.0, 0.22}
+\definecolor{capri}{rgb}{0.0, 0.75, 1.0}
+\definecolor{brightlavender}{rgb}{0.75, 0.58, 0.89}
+
+\title{\textbf{STAT 545 HW 4}}
+\author{Andres Efren Rocha Jayasinha}
+\setcounter{secnumdepth}{0}
+\date{Updated: \today} % suppresses the printed date
+
+\begin{document}
+\hypersetup{bookmarksnumbered=true,}
+\pagecolor{white}
+\color{black}
+\maketitle
+\begin{Large}
+\tableofcontents
+\end{Large}%
+\pagebreak
+
+\section{Assignment 4: Metropolis-Hastings algorithm}
+
+\subsection{Exercise 5.7}
+
+Exhibit a Metropolis-Hastings algorithm to sample from a binomial distribution with parameters n and p. Use a proportional distribution that is uniform on \{0,1,...,n\}.
+
+\smallskip
+
+\noindent \textbf{Solution}
+
+\noindent We wish to construct a Metropolis--Hastings (MH) algorithm to sample from a 
+Binomial distribution with parameters $n$ and $p$, whose probability mass 
+function is
+
+\[
+\pi(k) = \mathbb{P}(X = k)
+= \binom{n}{k} p^k (1-p)^{n-k},
+\qquad k \in \{0,1,\dots,n\}.
+\]
+
+\noindent We are instructed to use a proposal distribution that is uniform on 
+$\{0,1,\dots,n\}$. Thus, for any current state $x$,
+
+\[
+q(y \mid x) = \frac{1}{n+1}, 
+\qquad y \in \{0,1,\dots,n\}.
+\]
+
+\noindent This is an independence proposal (it does not depend on $x$), and it is symmetric in the sense that
+
+\[
+q(x \mid y) = q(y \mid x) = \frac{1}{n+1}.
+\]
+
+
+\noindent The general Metropolis--Hastings acceptance probability is
+
+\[
+\alpha(x,y)
+=
+\min\left(
+1,
+\frac{\pi(y)\, q(x \mid y)}{\pi(x)\, q(y \mid x)}
+\right).
+\]
+
+\noindent Since the proposal is symmetric, $q(x \mid y) = q(y \mid x)$ and these terms cancel. Therefore,
+
+\[
+\alpha(x,y)
+=
+\min\left(
+1,
+\frac{\pi(y)}{\pi(x)}
+\right).
+\]
+
+\noindent Substituting the Binomial pmf,
+
+\[
+\frac{\pi(y)}{\pi(x)}
+=
+\frac{
+\binom{n}{y} p^y (1-p)^{n-y}
+}{
+\binom{n}{x} p^x (1-p)^{n-x}
+}
+=
+\frac{\binom{n}{y}}{\binom{n}{x}}
+\left( \frac{p}{1-p} \right)^{y-x}.
+\]
+
+\noindent Hence the acceptance probability is
+
+\[
+\boxed{
+\alpha(x,y)
+=
+\min\left(
+1,
+\frac{\binom{n}{y}}{\binom{n}{x}}
+\left( \frac{p}{1-p} \right)^{y-x}
+\right).
+}
+\]
+
+\noindent Let $T$ be the total number of iterations, and choose an initial value 
+$x_0 \in \{0,1,\dots,n\}$.
+
+\noindent For $t = 1,2,\dots,T$:
+
+\begin{enumerate}
+    \item Propose $y \sim \text{Unif}\{0,1,\dots,n\}$.
+    \item Compute
+    \[
+    \alpha
+    =
+    \min\left(
+    1,
+    \frac{\pi(y)}{\pi(x_{t-1})}
+    \right).
+    \]
+    \item Draw $u \sim \text{Unif}(0,1)$.
+    \item If $u \le \alpha$, set $x_t = y$ (accept).
+    \item Otherwise, set $x_t = x_{t-1}$ (reject).
+\end{enumerate}
+
+\noindent The Markov chain $\{x_t\}$ constructed in this way has stationary 
+distribution $\text{Binomial}(n,p)$. After discarding an initial burn-in 
+period, the samples may be used as approximate draws from the target 
+distribution.
+
+\subsection{Exercise 5.8}
+
+The Metropolis--Hastings algorithm is used to simulate a binomial random variable with parameters
+$n=4$ and $p=\tfrac14$. The proposal distribution is a simple symmetric random walk on
+$\{0,1,2,3,4\}$ with reflecting boundaries.
+\begin{enumerate}
+  \item[(a)] Exhibit the $T$ matrix.
+  \item[(b)] Exhibit the transition matrix for the Markov chain created by the Metropolis--Hastings algorithm.
+  \item[(c)] Show explicitly that this transition matrix gives a reversible Markov chain whose stationary
+  distribution is the desired binomial distribution.
+\end{enumerate}
+
+\noindent \textbf{Solution}
+
+\noindent We want to simulate the target distribution
+\[
+\pi(k)=\binom{4}{k}\left(\frac14\right)^k\left(\frac34\right)^{4-k},\qquad k\in\{0,1,2,3,4\},
+\]
+using a Metropolis--Hastings (MH) chain whose proposal is a simple symmetric random walk on
+\(\{0,1,2,3,4\}\) with reflecting boundaries.
+
+\smallskip
+
+\noindent Part A:
+
+\noindent A simple symmetric random walk proposes moving one step left or right with probability \(1/2\)
+when in an interior state. At the boundaries, an attempted move outside the state space is
+reflected, assuming reflected boundaries implies the chain stays put with probability \(1/2\) and moves inward with probability \(1/2\).
+Thus, with states ordered as \(0,1,2,3,4\), the proposal matrix \(T=T(i,j)\) is
+\[
+T=
+\begin{pmatrix}
+\frac12 & \frac12 & 0 & 0 & 0 \\
+\frac12 & 0 & \frac12 & 0 & 0 \\
+0 & \frac12 & 0 & \frac12 & 0 \\
+0 & 0 & \frac12 & 0 & \frac12 \\
+0 & 0 & 0 & \frac12 & \frac12
+\end{pmatrix}.
+\]
+
+\noindent Part B:
+
+\noindent First compute the target probabilities:
+\[
+\pi(0)=\left(\frac34\right)^4=\frac{81}{256},\qquad
+\pi(1)=4\left(\frac14\right)\left(\frac34\right)^3=\frac{27}{64},
+\]
+\[
+\pi(2)=6\left(\frac14\right)^2\left(\frac34\right)^2=\frac{27}{128},\qquad
+\pi(3)=4\left(\frac14\right)^3\left(\frac34\right)=\frac{3}{64},
+\]
+\[
+\pi(4)=\left(\frac14\right)^4=\frac{1}{256}.
+\]
+
+\noindent Since the proposal is symmetric (\(T(i,j)=T(j,i)\)), the MH acceptance probability is
+\[
+\alpha(i,j)=\min\left(1,\frac{\pi(j)}{\pi(i)}\right).
+\]
+For neighboring moves this gives:
+\[
+\alpha(0,1)=1,\quad \alpha(1,0)=\frac34;\qquad
+\alpha(1,2)=\frac12,\quad \alpha(2,1)=1;
+\]
+\[
+\alpha(2,3)=\frac{2}{9},\quad \alpha(3,2)=1;\qquad
+\alpha(3,4)=\frac{1}{12},\quad \alpha(4,3)=1.
+\]
+
+\noindent The MH transition probabilities for \(i\neq j\) are
+\[
+P(i,j)=T(i,j)\,\alpha(i,j),
+\]
+and the diagonal entries are
+\[
+P(i,i)=1-\sum_{j\neq i}P(i,j).
+\]
+Therefore,
+\[
+P(0,1)=\frac12\cdot 1=\frac12,\qquad P(0,0)=\frac12.
+\]
+\[
+P(1,0)=\frac12\cdot\frac34=\frac38,\quad
+P(1,2)=\frac12\cdot\frac12=\frac14,\quad
+P(1,1)=1-\frac38-\frac14=\frac38.
+\]
+\[
+P(2,1)=\frac12\cdot 1=\frac12,\quad
+P(2,3)=\frac12\cdot\frac{2}{9}=\frac19,\quad
+P(2,2)=1-\frac12-\frac19=\frac{7}{18}.
+\]
+\[
+P(3,2)=\frac12\cdot 1=\frac12,\quad
+P(3,4)=\frac12\cdot\frac{1}{12}=\frac{1}{24},\quad
+P(3,3)=1-\frac12-\frac{1}{24}=\frac{11}{24}.
+\]
+\[
+P(4,3)=\frac12\cdot 1=\frac12,\qquad P(4,4)=\frac12.
+\]
+
+\noindent Hence, with state order \(0,1,2,3,4\),
+\[
+P=
+\begin{pmatrix}
+\frac12 & \frac12 & 0 & 0 & 0 \\
+\frac38 & \frac38 & \frac14 & 0 & 0 \\
+0 & \frac12 & \frac{7}{18} & \frac19 & 0 \\
+0 & 0 & \frac12 & \frac{11}{24} & \frac{1}{24} \\
+0 & 0 & 0 & \frac12 & \frac12
+\end{pmatrix}.
+\]
+
+\noindent Part C:
+
+\noindent To show reversibility, we verify the detailed balance equations:
+\[
+\pi(i)P(i,j)=\pi(j)P(j,i)\qquad \text{for all } i,j.
+\]
+Since transitions only occur between neighbors, it suffices to check the pairs
+\((0,1),(1,2),(2,3),(3,4)\).
+
+\paragraph{Pair \((0,1)\).}
+\[
+\pi(0)P(0,1)=\frac{81}{256}\cdot\frac12=\frac{81}{512},\qquad
+\pi(1)P(1,0)=\frac{27}{64}\cdot\frac38=\frac{81}{512}.
+\]
+
+\paragraph{Pair \((1,2)\).}
+\[
+\pi(1)P(1,2)=\frac{27}{64}\cdot\frac14=\frac{27}{256},\qquad
+\pi(2)P(2,1)=\frac{27}{128}\cdot\frac12=\frac{27}{256}.
+\]
+
+\paragraph{Pair \((2,3)\).}
+\[
+\pi(2)P(2,3)=\frac{27}{128}\cdot\frac19=\frac{27}{1152},\qquad
+\pi(3)P(3,2)=\frac{3}{64}\cdot\frac12=\frac{3}{128}=\frac{27}{1152}.
+\]
+
+\paragraph{Pair \((3,4)\).}
+\[
+\pi(3)P(3,4)=\frac{3}{64}\cdot\frac{1}{24}=\frac{3}{1536}=\frac{1}{512},\qquad
+\pi(4)P(4,3)=\frac{1}{256}\cdot\frac12=\frac{1}{512}.
+\]
+
+\noindent Thus detailed balance holds for all possible moves, so the chain is reversible with respect to \(\pi\).
+Finally, detailed balance implies stationarity: for each \(j\),
+\[
+\sum_i \pi(i)P(i,j)=\sum_i \pi(j)P(j,i)=\pi(j)\sum_i P(j,i)=\pi(j),
+\]
+so \(\pi P=\pi\). 
+
+\subsection{Exercise 5.18}
+
+\noindent A random variable $X$ has density function, defined up to proportionality,
+\[
+f(x) \propto e^{-(x-1)^2/2} + e^{-(x-4)^2/2}, \qquad 0 < x < 5.
+\]
+Implement a Metropolis--Hastings algorithm for simulating from the distribution.
+Use your algorithm to approximate the mean and variance of $X$.
+
+
+
+\noindent \textbf{Solution:}
+
+\noindent \textbf{Input:}
+
+\begin{lstlisting}[caption={Metropolis-Hastings algorithm}]
+### Exercise 5.18
+
+trials <- 1e6
+sim <- numeric(trials)
+sim[1] <- 2.45
+
+# unnormalized target density on (0,5)
+f_unnorm <- function(x) exp(-0.5 * (x - 1)^2) + exp(-0.5 * (x - 4)^2)
+
+for (i in 2:trials) {
+  old  <- sim[i - 1]
+  prop <- runif(1, 0, 5)  # independence proposal q(prop) = Uniform(0,5)
+  
+  acc <- f_unnorm(prop) / f_unnorm(old)
+  acc <- min(1, acc)      # acceptance probability
+  
+  sim[i] <- if (runif(1) < acc) prop else old
+}
+
+burn <- 10000
+x <- sim[(burn + 1):trials]
+
+mean(x)
+var(x)
+\end{lstlisting}
+
+\noindent \textbf{Output:} Mean of 2.496 and Variance of 2.099.
+
+\noindent \subsection{Exercise 5.19}
+
+\noindent Implement the algorithm in Exercise 5.7 for $n = 50$ and $p = \tfrac{1}{4}$. 
+Use your simulation to estimate 
+\[
+P(10 \le X \le 15),
+\]
+where $X$ has the given binomial distribution. 
+Compare your estimate to the exact probability.
+
+
+\noindent \textbf{Solution}
+
+\noindent \textbf{Input:}
+
+\begin{lstlisting}[caption={Metropolis-Hastings algorithm}]
+### Exercise 5.19
+
+trials <- 1e6
+n <- 50
+p <- 1/4
+
+sim <- numeric(trials)
+
+for (k in 1:trials) {
+  state <- 0
+  
+  # run chain for 60 steps to be near stationarity
+  for (i in 1:60) {
+    y <- sample(0:n, 1)  # proposal: Uniform over {0,1,...,n}
+    
+    # log acceptance ratio:
+    #   [C(n,y) p^y (1-p)^(n-y)] / [C(n,state) p^state (1-p)^(n-state)]
+    log_acc <- (lchoose(n, y) - lchoose(n, state)) +
+      (y - state) * log(p / (1 - p))
+    
+    acc <- min(1, exp(log_acc))
+    
+    if (runif(1) < acc) state <- y
+  }
+  
+  sim[k] <- as.integer(state >= 10 && state <= 15)
+}
+
+mean(sim)  # estimate of P(10 <= X <= 15)
+
+pbinom(15,n,p)-pbinom(9,n,p)
+\end{lstlisting}
+
+\noindent \textbf{Output:} Estimate = 0.671, Exact = .673
+
+\end{document}

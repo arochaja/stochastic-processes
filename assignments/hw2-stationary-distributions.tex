@@ -1,0 +1,796 @@
+\documentclass[hidelinks]{article}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tkz-euclide}
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage{fancyhdr}
+\usepackage{tocloft} % Add this package
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+  language=R,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{red},
+  commentstyle=\color{green},
+  stringstyle=\color{green},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=5pt,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false
+}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{amsthm}
+\usepackage[shortlabels]{enumitem}
+
+
+
+% Remove dots from table of contents
+\renewcommand{\cftdot}{}
+\renewcommand{\cftsecdotsep}{\cftnodots}
+\renewcommand{\cftsubsecdotsep}{\cftnodots}
+\newcommand{\RNum}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+
+
+\renewcommand{\contentsname}{Table of Contents}
+\usetikzlibrary{angles,calc, decorations.pathreplacing}
+\definecolor{carminered}{rgb}{1.0, 0.0, 0.22}
+\definecolor{capri}{rgb}{0.0, 0.75, 1.0}
+\definecolor{brightlavender}{rgb}{0.75, 0.58, 0.89}
+
+\title{\textbf{STAT 545 HW 2}}
+\author{Andres Efren Rocha Jayasinha}
+\setcounter{secnumdepth}{0}
+\date{Updated: \today} % suppresses the printed date
+
+\begin{document}
+\hypersetup{bookmarksnumbered=true,}
+\pagecolor{white}
+\color{black}
+\maketitle
+\begin{Large}
+\tableofcontents
+\end{Large}%
+\pagebreak
+
+\section{Assignment 2: Limiting and Stationary Distributions}
+
+\subsection{Exercise 3.7}
+A Markov chain has \textit{n} states. If the chain is at state \textit{k}, a coin is flipped, whose
+heads probability is \textit{p}. If the coin lands heads, the chain stays at \textit{k}. If the coin
+lands tails, the chain moves to a different state uniformly at random. Exhibit the
+transition matrix and find the stationary distribution.
+
+\smallskip
+
+\noindent \textcolor{green}{
+\textbf{Stationary Distribution.}
+Let $X_0, X_1, \ldots$ be a Markov chain with transition matrix $P$.
+A \emph{stationary distribution} is a probability distribution $\pi$
+that satisfies
+\[
+\pi = \pi P.
+\]
+That is,
+\[
+\pi_j = \sum_i \pi_i P_{ij}, \quad \text{for all } j.
+\]
+}
+
+\noindent \textbf{Solution}
+
+\noindent A stationary distribution $\pi$ satisfies
+\[
+\pi = \pi P,
+\]
+where $\pi$ is a row vector of dimension $(1 \times n)$ and $P$ is an $(n \times n)$ transition matrix.
+
+\medskip
+
+\noindent Writing this product explicitly,
+\[
+(\pi_1,\ldots,\pi_n)
+\begin{pmatrix}
+p_{11} & p_{12} & \cdots & p_{1n} \\
+p_{21} & p_{22} & \cdots & p_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+p_{n1} & p_{n2} & \cdots & p_{nn}
+\end{pmatrix}
+=
+(\pi_1,\ldots,\pi_n).
+\]
+
+\noindent In this chain,
+\[
+p_{ij} =
+\begin{cases}
+p, & i=j,\\[4pt]
+\dfrac{1-p}{n-1}, & i\neq j.
+\end{cases}
+\]
+
+\smallskip
+
+\noindent For each fixed $j$, the $j$th coordinate of $\pi P$ is
+\[
+\pi_j
+= \sum_{i=1}^n \pi_i p_{ij}
+= \pi_j p + \sum_{i\neq j} \pi_i \frac{1-p}{n-1}.
+\]
+
+\noindent Rearranging,
+\[
+\pi_j(1-p)
+= \frac{1-p}{n-1} \sum_{i\neq j} \pi_i.
+\]
+
+\noindent Since $1-p>0$, dividing both sides by $1-p$ gives
+\[
+\pi_j
+= \frac{1}{n-1} \sum_{i\neq j} \pi_i.
+\]
+
+\noindent Using $\sum_{i=1}^n \pi_i = 1$, we have $\sum_{i\neq j} \pi_i = 1-\pi_j$, hence
+\[
+\pi_j = \frac{1-\pi_j}{n-1}.
+\]
+
+\noindent Solving,
+\[
+(n-1)\pi_j = 1-\pi_j
+\quad\Rightarrow\quad
+n\pi_j = 1
+\quad\Rightarrow\quad
+\pi_j = \frac{1}{n}.
+\]
+
+\noindent Therefore, the stationary distribution is
+\[
+\boxed{\pi = \left(\frac1n,\ldots,\frac1n\right)}.
+\]
+
+\subsection{Exercise 3.8}
+
+\noindent Let
+\[
+P_1 =
+\begin{pmatrix}
+\frac14 & \frac34 \\
+\frac12 & \frac12
+\end{pmatrix},
+\qquad
+P_2 =
+\begin{pmatrix}
+\frac15 & \frac45 \\
+\frac45 & \frac15
+\end{pmatrix}.
+\]
+
+\noindent Consider a Markov chain on four states whose transition matrix is given by the block matrix
+
+\[
+P =
+\begin{pmatrix}
+P_1 & 0 \\
+0 & P_2
+\end{pmatrix}.
+\]
+
+\begin{enumerate}[(a)]
+\item Does the Markov chain have a unique stationary distribution? If so, find it.
+\item Does $\lim_{n\to\infty} P^n$ exist? If so, find it.
+\item Does the Markov chain have a limiting distribution? If so, find it.
+\end{enumerate}
+
+{\color{green}
+\noindent \textbf{Limiting Distribution.}
+
+\noindent Let $X_0, X_1, \ldots$ be a Markov chain with transition matrix $P$.
+A \emph{limiting distribution} for the Markov chain is a probability distribution
+$\lambda$ with the property that, for all $i$ and $j$,
+\[
+\lim_{n \to \infty} P^n_{ij} = \lambda_j.
+\]
+}
+
+\medskip
+
+{\color{green}
+\noindent \textbf{Limiting Distributions are Stationary Distributions.}
+
+\noindent Assume that $\pi$ is the limiting distribution of a Markov chain with
+transition matrix $P$. Then $\pi$ is a stationary distribution.
+}
+
+\medskip
+
+{\color{green}
+\noindent \textbf{Positive Matrices and Vectors.}
+
+\noindent A matrix $M$ is said to be \emph{positive} if all entries of $M$ are positive.
+In this case, we write $M>0$. Similarly, we write $x>0$ for a vector $x$ whose entries
+are all positive.
+
+\smallskip
+
+\noindent \emph{Note.} The notation $M>0$ (or $x>0$) means \emph{entrywise positivity},
+that is, every entry is strictly greater than zero. This is stronger than
+nonnegativity and does not refer to positive definiteness.
+}
+
+\medskip
+
+{\color{green}
+\noindent \textbf{Regular Transition Matrix.}
+
+\noindent A transition matrix $P$ is said to be \emph{regular} if some power of $P$
+is positive. That is,
+\[
+P^n > 0 \quad \text{for some } n \ge 1.
+\]
+}
+
+\medskip
+
+{\color{green}
+\noindent \textbf{Limit Theorem for Regular Markov Chains.}
+
+\noindent Let $X_0, X_1, \ldots$ be a Markov chain whose transition matrix $P$ is regular.
+Then the chain has a limiting distribution, which is the unique, positive
+stationary distribution of the chain. That is, there exists a unique probability
+vector $\pi>0$ such that
+\[
+\lim_{n\to\infty} P^n_{ij} = \pi_j,
+\quad \text{for all } i,j,
+\]
+where $\pi$ satisfies
+\[
+\sum_i \pi_i P_{ij} = \pi_j.
+\]
+
+\smallskip
+
+\noindent Equivalently, there exists a positive stochastic matrix $\Pi$ such that
+\[
+\lim_{n\to\infty} P^n = \Pi,
+\]
+where $\Pi$ has equal rows with common row $\pi$, and $\pi$ is the unique
+probability vector satisfying
+\[
+\pi P = \pi.
+\]
+}
+
+\noindent \textbf{Solution}
+
+\smallskip
+
+\noindent Part A:
+
+\smallskip
+
+\noindent A stationary distribution
+\[
+\pi = (\pi_1,\pi_2,\pi_3,\pi_4)
+= \big((\pi_1,\pi_2),(\pi_3,\pi_4)\big)
+\]
+must satisfy \(\pi=\pi P\). Since
+\[
+P=
+\begin{pmatrix}
+P_1 & 0\\
+0 & P_2
+\end{pmatrix},
+\]
+this is equivalent to requiring that:
+\begin{itemize}
+\item \((\pi_1,\pi_2)\) is a stationary distribution for \(P_1\),
+\item \((\pi_3,\pi_4)\) is a stationary distribution for \(P_2\),
+\item \(\pi_1+\pi_2+\pi_3+\pi_4=1\).
+\end{itemize}
+
+\smallskip
+
+\noindent We first find the stationary distribution of \(P_1\). Let \((a,b)\) satisfy
+\((a,b)=(a,b)P_1\) with \(a+b=1\). Then
+\[
+a=\frac14 a+\frac12 b
+\quad\Longrightarrow\quad
+\frac34 a=\frac12 b
+\quad\Longrightarrow\quad
+3a=2b.
+\]
+Together with \(a+b=1\), this yields \(a=\frac25\) and \(b=\frac35\). Hence,
+\[
+\pi^{(1)}=\left(\frac25,\frac35\right).
+\]
+
+\smallskip
+
+\noindent Next, we find the stationary distribution of \(P_2\). By symmetry of the transition
+matrix \(P_2\), the stationary distribution is
+\[
+\pi^{(2)}=\left(\frac12,\frac12\right).
+\]
+
+\smallskip
+
+\noindent Therefore, any stationary distribution of \(P\) is a combination of these two
+stationary distributions. Let \(\alpha\in[0,1]\) denote the total stationary mass assigned
+to states \(\{1,2\}\). Then all stationary distributions are given by
+\[
+\pi(\alpha)
+=
+\big(
+\alpha\,\pi^{(1)},\,
+(1-\alpha)\,\pi^{(2)}
+\big)
+=
+\left(
+\alpha\frac25,\,
+\alpha\frac35,\,
+(1-\alpha)\frac12,\,
+(1-\alpha)\frac12
+\right),
+\qquad 0\le \alpha\le 1.
+\]
+
+\smallskip
+
+\noindent Consequently, the Markov chain does \emph{not} have a unique stationary distribution.
+
+\medskip
+
+\noindent Part B:
+
+\noindent Since
+\[
+P=\begin{pmatrix}
+P_1 & 0\\
+0 & P_2
+\end{pmatrix},
+\]
+it follows by block-matrix multiplication that for every integer $n\ge 1$,
+\[
+P^n=\begin{pmatrix}
+P_1^n & 0\\
+0 & P_2^n
+\end{pmatrix}.
+\]
+Hence, $\lim_{n\to\infty}P^n$ exists if and only if both limits
+$\lim_{n\to\infty}P_1^n$ and $\lim_{n\to\infty}P_2^n$ exist, in which case
+\[
+\lim_{n\to\infty}P^n
+=
+\begin{pmatrix}
+\lim_{n\to\infty}P_1^n & 0\\
+0 & \lim_{n\to\infty}P_2^n
+\end{pmatrix}.
+\]
+
+\medskip
+
+\noindent All entries of $P_1$ are strictly positive, so $P_1$ is a regular transition
+matrix. By the Limit Theorem for Regular Markov Chains, $P_1$ has a unique
+positive stationary distribution, specifically $\pi^{(1)}=(\frac{3}{5},\frac{2}{5})$ as we showed in Part A,
+\[
+\implies
+\lim_{n\to\infty} P_1^n
+=
+\begin{pmatrix}
+\frac{3}{5} & \frac{2}{5}\\
+\frac{3}{5} & \frac{2}{5}
+\end{pmatrix}.
+\]
+
+\medskip
+
+\noindent Similarly, all entries of $P_2$ are strictly positive, so $P_2$ is also regular.
+By the Limit Theorem for Regular Markov Chains, $P_2$ has a unique positive
+stationary distribution, specifically $\pi^{(2)}=(\frac{1}{2},\frac{1}{2})$ as we showed in Part A,
+\[
+\implies
+\lim_{n\to\infty} P_2^n
+=
+\begin{pmatrix}
+\frac{1}{2} & \frac{1}{2}\\
+\frac{1}{2} & \frac{1}{2}
+\end{pmatrix}.
+\]
+
+\noindent Combining the two block limits, we conclude that
+\[
+\lim_{n\to\infty}P^n
+=
+\begin{pmatrix}
+\frac25 & \frac35 & 0 & 0\\[4pt]
+\frac25 & \frac35 & 0 & 0\\[4pt]
+0 & 0 & \frac12 & \frac12\\[4pt]
+0 & 0 & \frac12 & \frac12
+\end{pmatrix}
+\]
+Thus, $\lim_{n\to\infty}P^n$ exists and is given by the matrix above.
+
+\medskip
+
+\noindent Part C:
+
+\noindent Recall that a limiting distribution $\lambda$ must satisfy
+\[
+\lim_{n\to\infty} P^n_{ij} = \lambda_j
+\quad \text{for all } i,j,
+\]
+which is equivalent to requiring that every row of $P^n$ converges to the same
+probability vector.
+
+\noindent From part (b), we computed
+\[
+\lim_{n\to\infty} P^n
+=
+\begin{pmatrix}
+\frac25 & \frac35 & 0 & 0\\[4pt]
+\frac25 & \frac35 & 0 & 0\\[4pt]
+0 & 0 & \frac12 & \frac12\\[4pt]
+0 & 0 & \frac12 & \frac12
+\end{pmatrix}.
+\]
+The first two rows converge to $(\frac25,\frac35,0,0)$, while the last two rows
+converge to $(0,0,\frac12,\frac12)$. Since these limiting rows are not equal,
+there is no single probability vector $\lambda$ such that
+\[
+\lim_{n\to\infty} P^n_{ij} = \lambda_j
+\quad \text{for all } i.
+\]
+
+\noindent Therefore, the Markov chain does not have a limiting distribution.
+
+\subsection{Exercise 3.10}
+
+A Markov chain has transition matrix $P$ and limiting distribution $\pi$.
+Further assume that $\pi$ is the initial distribution of the chain; that is,
+the chain is in stationarity. Find the following:
+\begin{enumerate}[(a)]
+\item $\displaystyle \lim_{n\to\infty} \mathbb{P}(X_n = j \mid X_{n-1} = i)$
+\item $\displaystyle \lim_{n\to\infty} \mathbb{P}(X_n = j \mid X_0 = i)$
+\item $\displaystyle \lim_{n\to\infty} \mathbb{P}(X_{n+1} = k,\; X_n = j \mid X_0 = i)$
+\item $\displaystyle \lim_{n\to\infty} \mathbb{P}(X_0 = j \mid X_n = i)$
+\end{enumerate}
+
+\noindent \textbf{Solution}
+
+\noindent Part A:
+
+\noindent For each $n\ge 1$, by time-homogeneity of the Markov chain we have
+\[
+\mathbb{P}(X_n=j \mid X_{n-1}=i)
+=
+\mathbb{P}(X_1=j \mid X_0=i)
+= P_{ij}.
+\]
+Since this quantity does not depend on $n$, it follows that
+\[
+\lim_{n\to\infty}\mathbb{P}(X_n=j \mid X_{n-1}=i)=P_{ij}.
+\]
+
+\noindent Part B:
+
+\noindent For each $n\ge 0$,
+\[
+\mathbb{P}(X_n=j \mid X_0=i) = (P^n)_{ij}.
+\]
+Since the chain has limiting distribution $\pi$, by definition
+\[
+\lim_{n\to\infty} (P^n)_{ij} = \pi_j \qquad \text{for all } i,j.
+\]
+Therefore,
+\[
+\lim_{n\to\infty}\mathbb{P}(X_n=j \mid X_0=i)
+=
+\lim_{n\to\infty}(P^n)_{ij}
+=
+\pi_j.
+\]
+
+\noindent Part C:
+
+\noindent For $n\ge 0$,
+\[
+\mathbb{P}(X_{n+1}=k,\;X_n=j \mid X_0=i)
+=
+\mathbb{P}(X_n=j \mid X_0=i)\,
+\mathbb{P}(X_{n+1}=k \mid X_n=j,\;X_0=i).
+\]
+By the Markov property,
+\[
+\mathbb{P}(X_{n+1}=k \mid X_n=j,\;X_0=i)
+=
+\mathbb{P}(X_{n+1}=k \mid X_n=j)
+= P_{jk},
+\]
+and also
+\[
+\mathbb{P}(X_n=j \mid X_0=i) = (P^n)_{ij}.
+\]
+Hence
+\[
+\mathbb{P}(X_{n+1}=k,\;X_n=j \mid X_0=i)=(P^n)_{ij}\,P_{jk}.
+\]
+Since the chain has limiting distribution $\pi$, we have
+\[
+\lim_{n\to\infty}(P^n)_{ij}=\pi_j,
+\]
+and therefore
+\[
+\lim_{n\to\infty}\mathbb{P}(X_{n+1}=k,\;X_n=j \mid X_0=i)
+=
+\pi_j\,P_{jk}.
+\]
+
+\noindent Part D:
+
+\noindent By Bayes' rule,
+
+\[
+\mathbb{P}(X_0=j \mid X_n=i)
+=
+\frac{\mathbb{P}(X_n=i \mid X_0=j)\,\mathbb{P}(X_0=j)}{\mathbb{P}(X_n=i)}.
+\]
+Since the chain is started in stationarity, $\mathbb{P}(X_0=j)=\pi_j$ and
+$\mathbb{P}(X_n=i)=\pi_i$ for all $n$. Also,
+\[
+\mathbb{P}(X_n=i \mid X_0=j)=(P^n)_{ji}.
+\]
+Therefore,
+\[
+\mathbb{P}(X_0=j \mid X_n=i)=\frac{(P^n)_{ji}\,\pi_j}{\pi_i}.
+\]
+Because the chain has limiting distribution $\pi$, we have
+\[
+\lim_{n\to\infty}(P^n)_{ji}=\pi_i,
+\]
+and hence
+
+\[
+\lim_{n\to\infty}\mathbb{P}(X_0=j \mid X_n=i)
+=
+\lim_{n\to\infty}\frac{(P^n)_{ji}\,\pi_j}{\pi_i}
+=
+\frac{\pi_i\,\pi_j}{\pi_i}
+=
+\pi_j,
+\]
+
+
+
+
+
+
+
+\subsection{Exercise 3.14}
+
+The California Air Resources Board warns the public when smog levels are above certain thresholds. Days on which the board issues warnings are called \emph{episode days}. Lin (1981) models the daily sequence of episode and nonepisode days as a Markov chain with transition matrix
+\[
+P =
+\begin{pmatrix}
+0.77 & 0.23 \\
+0.24 & 0.76
+\end{pmatrix},
+\]
+where the rows and columns correspond to the states \emph{Nonepisode} and \emph{Episode}, respectively.
+
+\begin{enumerate}[(a)]
+\item What is the long-term probability that a given day will be an episode day?
+\item Over a year's time, about how many days are expected to be episode days?
+\end{enumerate}
+
+\noindent \textbf{Solution}
+
+\smallskip
+
+\noindent Part A:
+
+\noindent Let $\pi = (\pi_N, \pi_E)$ denote the stationary distribution of the Markov chain, where
+$\pi_N$ is the long-term probability of a nonepisode day and $\pi_E$ is the long-term
+probability of an episode day.
+
+\smallskip
+
+\noindent The stationary distribution satisfies
+\[
+\pi = \pi P,
+\qquad
+\pi_N + \pi_E = 1.
+\]
+
+\noindent Using the transition matrix
+\[
+P =
+\begin{pmatrix}
+0.77 & 0.23 \\
+0.24 & 0.76
+\end{pmatrix},
+\]
+\noindent we obtain the equations
+\[
+\pi_E = 0.23\,\pi_N + 0.76\,\pi_E.
+\]
+
+\noindent Rewriting,
+\[
+\pi_E - 0.76\,\pi_E = 0.23\,\pi_N
+\quad \Longrightarrow \quad
+0.24\,\pi_E = 0.23\,\pi_N.
+\]
+
+\noindent Using $\pi_N = 1 - \pi_E$, we have
+\[
+0.24\,\pi_E = 0.23(1 - \pi_E),
+\]
+which implies
+\[
+0.47\,\pi_E = 0.23.
+\]
+
+\noindent Thus,
+\[
+\pi_E = \frac{0.23}{0.47} \approx 0.489.
+\]
+
+\noindent Therefore, the long-term probability that a given day will be an episode day is approximately
+\[
+\boxed{0.489}
+\]
+
+\noindent Part B:
+
+\noindent From part (a), the long-term probability that a day is an episode day is
+\[
+\pi_E = \frac{0.23}{0.47} \approx 0.489.
+\]
+Over a period of $365$ days, the expected number of episode days is therefore
+\[
+\mathbb{E}[\text{\# episode days in a year}]
+\approx 365 \,\pi_E
+= 365\left(\frac{0.23}{0.47}\right)
+\approx 365(0.489)
+\approx 178.617
+\]
+So, over a year's time we expect about
+\[
+\boxed{179 \text{ episode days}}
+\]
+
+\subsection{Exercise 3.63}
+
+Hourly wind speeds in a northwestern region of Turkey are modeled by a Markov chain
+in Sahin and Sen (2001). Seven wind speed levels are the states of the chain.
+The transition matrix is
+\[
+P =
+\begin{pmatrix}
+0.756 & 0.113 & 0.129 & 0.002 & 0     & 0     & 0     \\
+0.174 & 0.821 & 0.004 & 0.001 & 0     & 0     & 0     \\
+0.141 & 0.001 & 0.776 & 0.082 & 0     & 0     & 0     \\
+0.003 & 0     & 0.192 & 0.753 & 0.052 & 0     & 0     \\
+0     & 0     & 0.002 & 0.227 & 0.735 & 0.036 & 0     \\
+0     & 0     & 0     & 0.007 & 0.367 & 0.604 & 0.022 \\
+0     & 0     & 0     & 0     & 0.053 & 0.158 & 0.789
+\end{pmatrix}
+\]
+
+\begin{enumerate}[(a)]
+\item Find the limiting distribution by
+\begin{enumerate}[(i)]
+\item taking high matrix powers, and
+\item using the \texttt{stationary} command in the \texttt{utilities.R} file.
+\end{enumerate}
+How often does the highest wind speed occur? How often does the lowest speed occur?
+
+\item Simulate the chain for $100{,}000$ steps and estimate the proportion of times
+that the chain visits each state.
+\end{enumerate}
+
+\noindent \textbf{Solution}
+
+\smallskip
+
+\noindent Part A:
+
+\noindent \textbf{Input:}
+
+\begin{lstlisting}[caption={Hourly Wind Speeds of a Region In Turkey}]
+## Part A
+
+# Part i
+
+# Transition matrix
+P <- matrix(c(
+  0.756, 0.113, 0.129, 0.002, 0.000, 0.000, 0.000,
+  0.174, 0.821, 0.004, 0.001, 0.000, 0.000, 0.000,
+  0.141, 0.001, 0.776, 0.082, 0.000, 0.000, 0.000,
+  0.003, 0.000, 0.192, 0.753, 0.052, 0.000, 0.000,
+  0.000, 0.000, 0.002, 0.227, 0.735, 0.036, 0.000,
+  0.000, 0.000, 0.000, 0.007, 0.367, 0.604, 0.022,
+  0.000, 0.000, 0.000, 0.000, 0.053, 0.158, 0.789
+), nrow = 7, byrow = TRUE)
+
+# Compute a high power of P
+Pn <- P
+for (i in 1:1000) {
+  Pn <- Pn %*% P
+}
+
+# Display the result
+round(Pn, 6)
+
+# Extract the limiting distribution (any row)
+pi_hat <- Pn[1, ]
+pi_hat
+
+# Frequencies of lowest and highest wind speed states
+pi_hat[1]   # lowest wind speed
+pi_hat[7]   # highest wind speed
+
+# Part ii
+
+source("~/Downloads/utilities.R")
+
+station_dist <- stationary(P)
+\end{lstlisting}
+
+\noindent \textbf{Output:}
+
+\noindent The Limiting Distribution is (three decimal places): $\begin{pmatrix}
+0.324 & 0.206 & 0.303 & 0.131 & 0.029 & 0.002 & 0.000
+\end{pmatrix}$
+
+\noindent The highest wind speed occurs 0\% of the time.
+
+\noindent The lowest wind speed occurs 32.4\% of the time.
+
+\medskip
+
+\noindent Part B:
+
+\noindent \textbf{Input:}
+
+\begin{lstlisting}[caption={Hourly Wind Speeds of a Region In Turkey}]
+## Part B
+
+P <- matrix(c(
+  0.756, 0.113, 0.129, 0.002, 0.000, 0.000, 0.000,
+  0.174, 0.821, 0.004, 0.001, 0.000, 0.000, 0.000,
+  0.141, 0.001, 0.776, 0.082, 0.000, 0.000, 0.000,
+  0.003, 0.000, 0.192, 0.753, 0.052, 0.000, 0.000,
+  0.000, 0.000, 0.002, 0.227, 0.735, 0.036, 0.000,
+  0.000, 0.000, 0.000, 0.007, 0.367, 0.604, 0.022,
+  0.000, 0.000, 0.000, 0.000, 0.053, 0.158, 0.789
+), nrow = 7, byrow = TRUE)
+
+# Compute a high power of P
+Pn <- P
+for (i in 1:100000) {
+  Pn <- Pn %*% P
+}
+
+P[1, ]
+\end{lstlisting}
+
+\noindent \textbf{Output}:
+
+\noindent Each row of the matrix $P_{n}$ converges to (three decimal placces): $\begin{pmatrix}
+0.324 & 0.206 & 0.303 & 0.131 & 0.029 & 0.002 & 0.000
+\end{pmatrix}$
+
+
+\end{document}

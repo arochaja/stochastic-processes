@@ -1,0 +1,199 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{enumitem}
+
+\begin{document}
+
+\begin{center}
+    {\Large \textbf{Summary: Absorbing Markov Chain Analysis}}\\[0.5em]
+\end{center}
+
+This problem illustrates the standard workflow for analyzing a finite Markov chain with transient states and multiple closed classes.  
+The key steps and concepts are summarized below so the method can be applied to similar problems.
+
+\section*{(a) Canonical Form of the Transition Matrix}
+
+The first step is to classify states as:
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{Transient states}: states that may be left permanently.
+    \item \textbf{Closed (absorbing) classes}: once entered, the chain never leaves.
+\end{itemize}
+
+After reordering states so that all transient states come first, the transition matrix takes the \textbf{canonical form}:
+\[
+P =
+\begin{pmatrix}
+Q & R \\
+0 & S
+\end{pmatrix},
+\]
+where:
+\begin{itemize}[leftmargin=2em]
+    \item $Q$ contains transitions among transient states,
+    \item $R$ contains transitions from transient states to closed states,
+    \item $S$ contains transitions within closed classes.
+\end{itemize}
+
+This reordering does not change the chain, but exposes its long-term structure.
+
+\section*{(b) Fundamental Matrix}
+
+The \textbf{fundamental matrix} is defined as
+\[
+F = (I - Q)^{-1}.
+\]
+
+Its interpretation is central:
+\begin{quote}
+$F_{ij}$ is the expected number of visits to transient state $j$ given the chain starts in transient state $i$.
+\end{quote}
+
+Equivalently,
+\[
+F = I + Q + Q^2 + Q^3 + \cdots,
+\]
+which sums expected visits over all time before absorption.
+
+\section*{(c) Expected Time to Absorption}
+
+The expected number of steps before entering a closed class is obtained by summing the entries of the corresponding row of $F$:
+\[
+\mathbb{E}_i[T_{\text{abs}}] = \sum_j F_{ij}.
+\]
+
+Each visit to a transient state corresponds to one unit of time, so row sums represent total expected time spent in transient states.
+
+\section*{(d) Absorption Probabilities}
+
+Define
+\[
+B = FR.
+\]
+
+Then:
+\begin{quote}
+$B_{ij}$ is the probability that the chain is eventually absorbed in closed state (or class) $j$, given it started in transient state $i$.
+\end{quote}
+
+This formula follows from linearity of expectation:
+\begin{itemize}[leftmargin=2em]
+    \item $F_{ik}$ counts how many times state $k$ is visited on average,
+    \item $R_{kj}$ gives the probability of exiting from $k$ to $j$,
+    \item Multiplying and summing accounts for all possible exit times.
+\end{itemize}
+
+\section*{(e) Limiting Distribution}
+
+If the chain has multiple closed classes, there is \textbf{no unique global limiting distribution}.  
+Instead, the limit depends on the starting state.
+
+The limiting distribution is constructed as follows:
+\begin{enumerate}[leftmargin=2em]
+    \item Transient states receive probability $0$ in the limit.
+    \item Absorption probabilities (from $B$) determine which closed class is entered.
+    \item Within each closed class, the chain converges to that class’s \textbf{stationary distribution}.
+\end{enumerate}
+
+The final limiting distribution is a weighted mixture of the stationary distributions of the closed classes, with weights given by absorption probabilities.
+
+\section*{Key Takeaway}
+
+\begin{quote}
+\textit{Absorbing Markov chain analysis separates behavior into three phases:  
+(1) movement among transient states,  
+(2) probabilities of entering closed classes, and  
+(3) long-run behavior within those classes.}
+\end{quote}
+
+This framework applies broadly to Markov chains with transient behavior followed by absorption.
+
+\newpage
+\section*{Estimating and Smoothing Markov Transition Probabilities}
+
+Consider a time-homogeneous Markov chain with finite state space
+\[
+\mathcal{S} = \{1,2,\dots,K\},
+\]
+and let \(n_{ij}\) denote the observed number of transitions from state \(i\) to state \(j\).
+Define the row totals
+\[
+n_{i\cdot} = \sum_{j=1}^K n_{ij}.
+\]
+
+\subsection*{Maximum Likelihood Estimation (MLE)}
+
+Conditioning on being in state \(i\), the next-state transitions follow a multinomial distribution.
+The maximum likelihood estimator of the transition probabilities is obtained by row normalization:
+\[
+\hat p_{ij}
+=
+\Pr(X_{n+1}=j \mid X_n=i)
+=
+\frac{n_{ij}}{n_{i\cdot}},
+\quad j=1,\dots,K.
+\]
+
+This estimator is simple and unbiased asymptotically, but can be unstable when \(n_{i\cdot}\) is small.
+
+\subsection*{Limitations of the MLE}
+
+If a particular state \(i\) is rarely observed (small \(n_{i\cdot}\)), then:
+\begin{itemize}
+  \item Estimates have high variance.
+  \item Zero counts produce zero probability estimates, even if the true transition probability is nonzero.
+\end{itemize}
+These issues motivate smoothing or regularization.
+
+\subsection*{Laplace (Add-One) Smoothing}
+
+Laplace smoothing adjusts the counts by adding a constant (typically 1) to each possible transition:
+\[
+\tilde n_{ij} = n_{ij} + 1.
+\]
+
+The smoothed transition probabilities are then:
+\[
+\tilde p_{ij}
+=
+\frac{n_{ij} + 1}{n_{i\cdot} + K}.
+\]
+
+Laplace smoothing guarantees strictly positive probabilities but does not incorporate external structural information.
+
+\subsection*{Dirichlet Smoothing with an Empirical Bayes Prior}
+
+A more principled approach places a Dirichlet prior on each transition row:
+\[
+(p_{i1},\dots,p_{iK}) \sim \text{Dirichlet}(\alpha_1,\dots,\alpha_K).
+\]
+
+Let the prior mean be \(m = (m_1,\dots,m_K)\) with \(\sum_j m_j = 1\), and let \(\alpha > 0\) denote the prior strength.
+Then:
+\[
+\alpha_j = \alpha m_j.
+\]
+
+After observing transition counts \(n_{ij}\), the posterior distribution is:
+\[
+(p_{i1},\dots,p_{iK}) \mid \text{data}
+\sim
+\text{Dirichlet}(\alpha_1 + n_{i1},\dots,\alpha_K + n_{iK}).
+\]
+
+The posterior mean (used as a smoothed estimator) is:
+\[
+\tilde p_{ij}
+=
+\frac{\alpha m_j + n_{ij}}{\alpha + n_{i\cdot}}.
+\]
+
+\subsection*{Interpretation}
+
+\begin{itemize}
+  \item \(\alpha\) controls the influence of the prior relative to the data.
+  \item The estimator is a convex combination of the prior mean and the MLE.
+  \item Empirical Bayes chooses \(m\) from pooled or related data, allowing information sharing across states.
+\end{itemize}
+
+\end{document}

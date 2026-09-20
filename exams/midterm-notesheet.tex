@@ -1,0 +1,257 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{setspace}
+\setstretch{1.15}
+
+\definecolor{mygreen}{rgb}{0,0.55,0}
+
+\newcommand{\defn}[1]{\textcolor{mygreen}{\textbf{Definition:} #1}}
+\newcommand{\thm}[1]{\textcolor{mygreen}{\textbf{Theorem:} #1}}
+\newcommand{\idea}[1]{\textcolor{mygreen}{\textbf{Key Idea:} #1}}
+
+\begin{document}
+
+\begin{center}
+{\Large \textbf{STAT 545 Midterm Notesheet}}\\
+\vspace{0.2cm}
+Markov Chains --- Definitions, Techniques, and Worked Examples
+\end{center}
+
+\vspace{0.4cm}
+
+%------------------------------------------------
+\section*{1. Two-State Markov Chains}
+
+\defn{A (time-homogeneous) Markov chain satisfies
+\[
+P(X_{n+1}=j \mid X_n=i, X_{n-1},\dots) = P_{ij}.
+\]}
+
+For a two-state chain $\{0,1\}$ with
+\[
+P =
+\begin{pmatrix}
+1-p & p\\
+q & 1-q
+\end{pmatrix},
+\quad
+\alpha = (\alpha_0,\alpha_1),
+\]
+we compute several useful quantities.
+
+\subsection*{Two-Step Transitions}
+\idea{Compute $P^2 = P \cdot P$ entrywise.}
+
+\[
+P^2 =
+\begin{pmatrix}
+(1-p)^2 + pq & p(2-p-q)\\
+q(2-p-q) & (1-q)^2 + pq
+\end{pmatrix}.
+\]
+
+\subsection*{Expectation of the State}
+\idea{Since $X_n \in \{0,1\}$,
+\[
+E[X_n] = P(X_n = 1).
+\]}
+
+Thus,
+\[
+E[X_2] = (\alpha P^2)_1
+= \alpha_0 P^2_{01} + \alpha_1 P^2_{11}.
+\]
+
+\subsection*{General $n$-Step Behavior}
+\thm{For $p+q>0$, the $n$-step transition matrix is}
+\[
+P^n = \frac{1}{p+q}
+\begin{pmatrix}
+q + p c_n & p - p c_n\\
+q - q c_n & p + q c_n
+\end{pmatrix},
+\quad c_n = (1-p-q)^n.
+\]
+
+Therefore,
+\[
+E[X_n]
+= \frac{p}{p+q} + \left(\alpha_1 - \frac{p}{p+q}\right)c_n.
+\]
+
+\subsection*{Long-Run Limit}
+\idea{If $|1-p-q|<1$, then $c_n \to 0$.}
+
+\[
+\lim_{n\to\infty} E[X_n] = \frac{p}{p+q}.
+\]
+
+\idea{This equals the stationary probability of state 1.}
+
+\subsection*{Return Times}
+\thm{For an irreducible Markov chain,
+\[
+E[T_i \mid X_0=i] = \frac{1}{\pi_i},
+\]
+where $\pi$ is the stationary distribution.}
+
+Here,
+\[
+\pi = \left(\frac{q}{p+q}, \frac{p}{p+q}\right),
+\quad
+E[T_1 \mid X_0=1] = \frac{p+q}{p}.
+\]
+
+\subsection*{Closed-Form Expression for \texorpdfstring{$P^n$}{Pn}}
+
+For the two-state Markov chain with transition matrix
+\[
+P =
+\begin{pmatrix}
+1-p & p\\
+q & 1-q
+\end{pmatrix},
+\qquad p,q \ge 0,\; p+q>0,
+\]
+the $n$-step transition matrix admits the closed-form solution
+\[
+\boxed{
+P^n
+=
+\frac{1}{p+q}
+\begin{pmatrix}
+q + p(1-p-q)^n & p - p(1-p-q)^n\\[6pt]
+q - q(1-p-q)^n & p + q(1-p-q)^n
+\end{pmatrix}
+}
+\]
+
+\idea{Key structure:}
+\begin{itemize}[leftmargin=1.2em]
+  \item $(1-p-q)^n$ is the \emph{decay term} (second eigenvalue raised to power $n$).
+  \item The constant terms correspond to the stationary distribution
+  \[
+  \pi=\left(\frac{q}{p+q},\frac{p}{p+q}\right).
+  \]
+  \item As $n\to\infty$, the exponential term vanishes whenever $|1-p-q|<1$.
+\end{itemize}
+
+\idea{Fast consistency check (exam trick):}
+\begin{itemize}[leftmargin=1.2em]
+  \item Rows sum to 1.
+  \item Setting $n=0$ recovers $P^0=I$.
+  \item Taking $n\to\infty$ gives rows equal to $\pi$.
+\end{itemize}
+
+%------------------------------------------------
+\section*{2. Random Walks on Graphs}
+
+\defn{A simple random walk moves uniformly to a neighboring vertex.}
+
+\subsection*{Transition Matrices}
+\idea{For vertex $i$,
+\[
+P_{ij} = \frac{1}{\deg(i)} \quad \text{if } i \sim j.
+\]}
+
+Always compute degrees first, then normalize rows.
+
+\subsection*{Communication Classes}
+\defn{States $i,j$ communicate if $i \to j$ and $j \to i$.}
+
+\idea{Disconnected components $\Rightarrow$ multiple classes.}
+
+\subsection*{Recurrence}
+\thm{All states in a finite irreducible Markov chain are recurrent.}
+
+\subsection*{Period}
+\defn{The period of state $i$ is
+\[
+d(i) = \gcd\{n \ge 1 : P^n_{ii} > 0\}.
+\]}
+
+\idea{Bipartite graphs typically have period 2.}
+
+\subsection*{Ergodicity}
+\thm{A Markov chain is ergodic iff it is irreducible and aperiodic.}
+
+\idea{Lazy random walks (self-loop probability $>0$) are always aperiodic.}
+
+%------------------------------------------------
+\section*{3. Absorbing Markov Chains}
+
+\defn{A state is absorbing if $P_{ii}=1$.}
+
+\idea{Reorder states so transient states come first.}
+
+\[
+P =
+\begin{pmatrix}
+Q & R\\
+0 & S
+\end{pmatrix}
+\]
+
+\subsection*{Fundamental Matrix}
+\thm{The fundamental matrix is
+\[
+F = (I-Q)^{-1}.
+\]}
+
+\idea{$F_{ij}$ = expected number of visits to $j$ starting from $i$ before absorption.}
+
+\subsection*{Expected Time to Absorption}
+\[
+E[T \mid X_0=i] = \sum_j F_{ij}.
+\]
+
+\subsection*{Absorption Probabilities}
+\[
+\text{Absorption probabilities} = FR.
+\]
+
+\subsection*{Limiting Distribution}
+\thm{If all closed classes are aperiodic,
+\[
+\lim_{n\to\infty} P^n =
+\begin{pmatrix}
+0 & (I-Q)^{-1} R \Pi\\
+0 & \Pi
+\end{pmatrix},
+\]
+where $\Pi$ contains stationary distributions of closed classes.}
+
+%------------------------------------------------
+\section*{4. Estimating Transition Matrices}
+
+\subsection*{Maximum Likelihood Estimation}
+\defn{The MLE of $P$ is obtained by row-normalizing transition counts.}
+
+\idea{Small sample sizes $\Rightarrow$ unreliable estimates.}
+
+\subsection*{Laplace Smoothing}
+\defn{Add 1 to each count:
+\[
+\hat p_i = \frac{N_i + 1}{\sum_j (N_j + 1)}.
+\]}
+
+\idea{Prevents zero probabilities.}
+
+\subsection*{Dirichlet (Empirical Bayes) Smoothing}
+\defn{Use a Dirichlet prior with mean $\mu$ and strength $\alpha$.}
+
+Posterior mean:
+\[
+\tilde p_i = \frac{N_i + \alpha \mu_i}{N + \alpha}.
+\]
+
+\idea{Borrow strength from other rows (pooled information).}
+
+
+
+%------------------------------------------------
+\end{document}

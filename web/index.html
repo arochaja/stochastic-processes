@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stochastic Processes — Andres Rocha Jayasinha</title>
+<meta name="description" content="Compiled coursework, applied projects, and reference notes on Markov chains, MCMC, Poisson processes, and Brownian motion.">
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --panel: #ffffff;
+    --ink: #17181c;
+    --muted: #64676f;
+    --line: #e5e3de;
+    --accent: #2f5d8c;
+    --accent-soft: #eef3f8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14151a;
+      --panel: #1c1e25;
+      --ink: #eceef2;
+      --muted: #9aa0ab;
+      --line: #2c2f38;
+      --accent: #8ab4e0;
+      --accent-soft: #232833;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.6 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 56px 16px 80px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 40px; }
+  h1 { font-size: clamp(28px, 6vw, 38px); line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); margin: 0 0 18px; font-size: 17px; }
+  .byline { font-size: 15px; margin: 0; }
+  .byline a { color: var(--accent); text-decoration: none; }
+  .byline a:hover { text-decoration: underline; }
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted); margin: 44px 0 14px; font-weight: 600;
+  }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  li a {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; transition: border-color .15s, background .15s, transform .15s;
+  }
+  li a:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .name { font-weight: 600; }
+  .tag {
+    font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--line); border-radius: 999px;
+    padding: 2px 8px; white-space: nowrap;
+  }
+  .desc { color: var(--muted); font-size: 14.5px; margin-top: 4px; }
+  footer {
+    margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 14px;
+  }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Stochastic Processes</h1>
+    <p class="sub">Markov chains, MCMC, Poisson processes, and Brownian motion — coursework, applied projects, and reference notes, compiled from LaTeX.</p>
+    <p class="byline">Andres Efren Rocha Jayasinha · <a href="https://github.com/arochaja/stochastic-processes">Source on GitHub</a></p>
+  </header>
+
+  <h2>Applied projects</h2>
+  <ul>
+    <li><a href="projects/caiso-markov-prices/writeup.pdf">
+      <div class="row"><span class="name">Modeling California Energy Prices Using Markov Chains</span><span class="tag">PDF</span></div>
+      <div class="desc">A four-regime Markov model fit to ~35M rows of hourly CAISO price data, using expected dwell times to locate the nodes where high prices persist.</div>
+    </a></li>
+    <li><a href="projects/neural-spike-trains/writeup.pdf">
+      <div class="row"><span class="name">Effect of Citronellal Odor Puffs on Cockroach Neurons</span><span class="tag">PDF</span></div>
+      <div class="desc">Spike trains modeled as a non-homogeneous Poisson process with a smooth baseline and per-trial random effects; the stimulus effect is real but neuron-specific.</div>
+    </a></li>
+  </ul>
+
+  <h2>Exam material &amp; reference notes</h2>
+  <ul>
+    <li><a href="exams/final-notesheet.pdf">
+      <div class="row"><span class="name">Final Exam Notesheet</span><span class="tag">PDF</span></div>
+      <div class="desc">Two-column reference covering the full course, from stationary distributions through Brownian bridges and Gibbs sweeps.</div>
+    </a></li>
+    <li><a href="exams/midterm-notesheet.pdf">
+      <div class="row"><span class="name">Midterm Notesheet</span><span class="tag">PDF</span></div>
+      <div class="desc">Two-state chains, random walks on graphs, absorbing chains, and smoothed estimation of transition matrices.</div>
+    </a></li>
+    <li><a href="exams/final-practice-rigorous.pdf">
+      <div class="row"><span class="name">Final Practice — Rigorous Solutions</span><span class="tag">PDF</span></div>
+      <div class="desc">Full proofs for eight practice problems: reflecting walks, Metropolis–Hastings, Gibbs sampling, Poisson arrivals, lattice walks, and the Brownian bridge.</div>
+    </a></li>
+    <li><a href="exams/final-practice-expanded.pdf">
+      <div class="row"><span class="name">Final Practice — Expanded Solutions</span><span class="tag">PDF</span></div>
+      <div class="desc">The same eight problems worked at length, naming the theorem behind each step and why it applies.</div>
+    </a></li>
+    <li><a href="notes/absorbing-chain-workflow.pdf">
+      <div class="row"><span class="name">Absorbing Markov Chain Analysis</span><span class="tag">PDF</span></div>
+      <div class="desc">The canonical form → fundamental matrix → absorption probability workflow, written up as a reusable method.</div>
+    </a></li>
+  </ul>
+
+  <h2>Assignments</h2>
+  <ul>
+    <li><a href="assignments/hw1-markov-chains.pdf">
+      <div class="row"><span class="name">HW 1 — Introduction to Markov Chains</span><span class="tag">PDF</span></div>
+      <div class="desc">Transition matrices, <em>n</em>-step probabilities, stochastic matrices with equal rows, gambler's ruin.</div>
+    </a></li>
+    <li><a href="assignments/hw2-stationary-distributions.pdf">
+      <div class="row"><span class="name">HW 2 — Limiting and Stationary Distributions</span><span class="tag">PDF</span></div>
+      <div class="desc">Solving πP = π, existence and uniqueness, long-run behavior.</div>
+    </a></li>
+    <li><a href="assignments/hw3-recurrence-and-absorption.pdf">
+      <div class="row"><span class="name">HW 3 — Recurrence, Transience, and Periodicity</span><span class="tag">PDF</span></div>
+      <div class="desc">Communicating-class decomposition, absorbing chains, fundamental matrix, expected absorption times.</div>
+    </a></li>
+    <li><a href="assignments/hw4-metropolis-hastings.pdf">
+      <div class="row"><span class="name">HW 4 — Metropolis–Hastings</span><span class="tag">PDF</span></div>
+      <div class="desc">Acceptance ratios, detailed balance verification, proposal design.</div>
+    </a></li>
+    <li><a href="assignments/hw5-gibbs-sampler.pdf">
+      <div class="row"><span class="name">HW 5 — Gibbs Sampler</span><span class="tag">PDF</span></div>
+      <div class="desc">Full conditionals and the Bayesian lasso.</div>
+    </a></li>
+    <li><a href="assignments/hw6-poisson-processes.pdf">
+      <div class="row"><span class="name">HW 6 — Homogeneous Poisson Processes</span><span class="tag">PDF</span></div>
+      <div class="desc">Interarrival times, superposition, thinning, conditional uniformity.</div>
+    </a></li>
+  </ul>
+
+  <footer>
+    Built from LaTeX source on every push ·
+    <a href="https://github.com/arochaja/stochastic-processes">github.com/arochaja/stochastic-processes</a>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,674 @@
+\documentclass[hidelinks]{article}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{tkz-euclide}
+\usepackage[unicode]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage{fancyhdr}
+\usepackage{tocloft} % Add this package
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+  language=R,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{red},
+  commentstyle=\color{green},
+  stringstyle=\color{green},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=5pt,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false
+}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{amsthm}
+\usepackage[shortlabels]{enumitem}
+
+
+
+% Remove dots from table of contents
+\renewcommand{\cftdot}{}
+\renewcommand{\cftsecdotsep}{\cftnodots}
+\renewcommand{\cftsubsecdotsep}{\cftnodots}
+\newcommand{\RNum}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+
+
+\renewcommand{\contentsname}{Table of Contents}
+\usetikzlibrary{angles,calc, decorations.pathreplacing}
+\definecolor{carminered}{rgb}{1.0, 0.0, 0.22}
+\definecolor{capri}{rgb}{0.0, 0.75, 1.0}
+\definecolor{brightlavender}{rgb}{0.75, 0.58, 0.89}
+
+\title{\textbf{STAT 545 HW 5}}
+\author{Andres Efren Rocha Jayasinha}
+\setcounter{secnumdepth}{0}
+\date{Updated: \today} % suppresses the printed date
+
+\begin{document}
+\hypersetup{bookmarksnumbered=true,}
+\pagecolor{white}
+\color{black}
+\maketitle
+\begin{Large}
+\tableofcontents
+\end{Large}%
+\pagebreak
+
+\section{Assignment 5: Gibb's Sampler}
+
+\subsection{Exercise 5.7}
+
+Random variables $X$ and $N$ have joint distribution, defined up to a constant of proportionality,
+\[
+f(x,n)\propto \frac{e^{-3x}x^n}{n!}, \qquad \text{for } n=0,1,2,\ldots \text{ and } x>0.
+\]
+Note that $X$ is continuous and $N$ is discrete.
+\begin{enumerate}
+  \item[(a)] Implement a Gibbs sampler to sample from this distribution.
+  \item[(b)] Use your simulation to estimate (i) $P(X^2<N)$ and (ii) $E(XN)$.
+  \item[(c)] Identify the prior and conditional likelihood that produce this target as a joint distribution, and write the corresponding hierarchical model.
+\end{enumerate}
+
+\noindent \textbf{Solution}
+
+\noindent Part A/B:
+
+\noindent \textbf{Input:}
+
+\begin{lstlisting}[caption={Gibb's Sampler}]
+### Exercise 5.17
+
+trials <- 100000
+simlist <- matrix(rep(0,trials*2),ncol=2)  ## (X,N)
+simlist[1,] <- c(1,1)
+
+for (i in 2:trials) {
+  simlist[i,1] <- rgamma(1, 1 + simlist[i-1,2],3)
+  simlist[i,2] <- rpois(1,simlist[i,1]) }
+
+mean( (simlist[,1]^2 < simlist[,2] ) )  # P(X^2 < N)
+mean(simlist[,1]*simlist[,2])           # E(XN)
+\end{lstlisting}
+
+\noindent \textbf{Output:} $P(X<N) = 0.26244$ and $E[XN] = 0.4898135$
+
+\medskip
+
+\noindent Part C:
+
+\noindent The joint distribution is given (up to proportionality) by
+\[
+f(x,n)\propto \frac{e^{-3x}x^n}{n!}, 
+\qquad x>0,\; n=0,1,2,\ldots
+\]
+
+\noindent To identify a prior and conditional likelihood, write the joint in the form
+\[
+p(x,n)=p(n\mid x)\,p(x).
+\]
+
+\noindent Observe that
+\[
+\frac{e^{-3x}x^n}{n!}
+=
+\left(\frac{e^{-x}x^n}{n!}\right)\, e^{-2x}.
+\]
+
+\noindent The first factor,
+\[
+\frac{e^{-x}x^n}{n!},
+\]
+is exactly the probability mass function of a Poisson distribution with parameter $x$. Hence it is natural to interpret
+\[
+p(n\mid x)=\frac{e^{-x}x^n}{n!},
+\]
+so that
+\[
+N \mid X=x \sim \text{Poisson}(x).
+\]
+This is the \emph{conditional likelihood}, describing how the data variable $N$ is generated given the parameter $X$.
+
+\noindent The remaining factor,
+\[
+e^{-2x}, \qquad x>0,
+\]
+depends only on $x$ and is proportional to a Gamma density with shape $\alpha=1$ and rate $\beta=2$. Therefore,
+\[
+p(x) \propto e^{-2x}, \qquad x>0,
+\]
+which corresponds to
+\[
+X \sim \text{Gamma}(1,2),
+\]
+that is, an Exponential distribution with rate $2$. This distribution plays the role of the \emph{prior}, representing the distribution assigned to $X$ before observing $N$.
+
+\noindent Thus, the joint distribution can be viewed as arising from the hierarchical model
+\[
+\boxed{
+\begin{aligned}
+X &\sim \text{Exponential}(2), \\
+N \mid X=x &\sim \text{Poisson}(x).
+\end{aligned}}
+\]
+
+\noindent In other words, one first draws $X$ from an Exponential$(2)$ distribution, and then, conditional on this value of $X$, draws $N$ from a Poisson distribution with mean $x$. This prior–likelihood combination produces the given joint distribution.
+
+\subsection{Bayesian Lasso}
+
+\noindent Consider the linear regression setting with $Y \in \mathbb{R}^n$ and 
+$X \in \mathbb{R}^{n \times p}$ and let
+\[
+Y \mid \beta, \sigma^2 \sim \mathcal{N}(X\beta, \sigma^2 I_n),
+\]
+\[
+\beta_j \stackrel{iid}{\sim} \text{Laplace}(0,\lambda),
+\]
+\[
+\sigma^2 \sim \text{Inverse-Gamma}(a,b),
+\]
+where $\lambda, a, b > 0$ are constants. The priors give:
+\[
+f(\beta_j) = \frac{\lambda}{2}\exp\{-\lambda |\beta_j|\},
+\qquad
+f(\sigma^2) = \frac{b^a}{\Gamma(a)}(\sigma^2)^{-(a+1)} 
+\exp\left\{-\frac{b}{\sigma^2}\right\}.
+\]
+
+\noindent In this problem you will estimate the model parameters by sampling from 
+the posterior using MCMC.
+
+\begin{enumerate}
+    \item[(a)] Write the log-posterior $\log f(\beta, \sigma^2 \mid y)$ 
+    up to an additive constant.
+    
+    \item[(b)] Write the (log) full conditionals of the $j$th coefficient 
+    $\beta_j$ and the variance parameter $\sigma^2$ up to an additive constant.
+    
+    \item[(c)] Consider the Metropolis update for $\beta_j$ using a Gaussian 
+    random walk proposal $\beta_j^* = \beta_j + \varepsilon$ with 
+    $\varepsilon \sim \mathcal{N}(0,s^2)$. Derive the log acceptance ratio 
+    $\log r(\beta_j, \beta_j^*)$ for the update.
+    
+    \item[(d)] Write pseudocode for the Metropolis-within-Gibbs algorithm 
+    to sample from the posterior of $(\beta, \sigma^2)$.
+    
+    \item[(e)] Code up your algorithm from the previous part. Using the 
+    \texttt{diabetes} dataset in the \texttt{lars} package (see provided script), 
+    compute estimates of the regression coefficients and variance parameter. 
+    Use $a = b = 2$ with $\lambda = 1$. Tune the random walk step size 
+    until your coordinatewise acceptance rates are between 40\% and 60\%. 
+    Report your final acceptance rates, coordinatewise effective sample sizes, 
+    and estimates of posterior means for the regression coefficients.
+    
+    \item[(f)] Which variables are associated with an estimated increase in mean 
+    disease progression? A decrease? No association?
+    
+    \item[(g)] Increase $\lambda$ to 2 and leave other settings the same. 
+    How do coefficient estimates change, if at all?
+\end{enumerate}
+
+\noindent \textbf{Solution}
+
+\noindent Part A:
+
+\noindent The posterior satisfies
+\[
+f(\beta,\sigma^2\mid y)\ \propto\ f(y\mid \beta,\sigma^2)\,f(\beta)\,f(\sigma^2).
+\]
+
+\noindent From $Y\mid \beta,\sigma^2\sim \mathcal N(X\beta,\sigma^2 I_n)$,
+\[
+f(y\mid \beta,\sigma^2)=(2\pi\sigma^2)^{-n/2}\exp\!\left\{-\frac{1}{2\sigma^2}\|y-X\beta\|^2\right\},
+\]
+so
+\[
+\log f(y\mid \beta,\sigma^2)= -\frac{n}{2}\log(\sigma^2)-\frac{1}{2\sigma^2}\|y-X\beta\|^2 + C.
+\]
+
+\noindent Independence of the Laplace priors gives
+\[
+f(\beta)=\prod_{j=1}^p \frac{\lambda}{2}\exp\{-\lambda|\beta_j|\}
+\quad\Rightarrow\quad
+\log f(\beta)= -\lambda\sum_{j=1}^p|\beta_j| + C.
+\]
+
+\noindent For $\sigma^2\sim \text{Inverse-Gamma}(a,b)$ with density
+\[
+f(\sigma^2)=\frac{b^a}{\Gamma(a)}(\sigma^2)^{-(a+1)}\exp\!\left\{-\frac{b}{\sigma^2}\right\},
+\]
+\[
+\log f(\sigma^2)=-(a+1)\log(\sigma^2)-\frac{b}{\sigma^2}+C.
+\]
+
+\noindent Adding terms yields the log-posterior (up to an additive constant):
+\[
+\boxed{
+\log f(\beta,\sigma^2\mid y)
+=
+-\left(\frac{n}{2}+a+1\right)\log(\sigma^2)
+-\frac{1}{2\sigma^2}\|y-X\beta\|^2
+-\frac{b}{\sigma^2}
+-\lambda\sum_{j=1}^p|\beta_j|
++ C.}
+\]
+
+\noindent Part B:
+
+\noindent The log-posterior from part (a), up to an additive constant, is
+\[
+\log f(\beta,\sigma^2 \mid y)
+=
+-\frac{1}{2\sigma^2}\|y - X\beta\|^2
+-\lambda \sum_{k=1}^p |\beta_k|
+-\left(\frac{n}{2}+a+1\right)\log(\sigma^2)
+-\frac{b}{\sigma^2}
++ C.
+\]
+
+\medskip
+
+\noindent \textbf{Full conditional of $\beta_j$.}
+
+\noindent Let $x_j$ denote the $j$th column of $X$, and define the partial residual
+\[
+r_j = y - \sum_{k\neq j} x_k \beta_k
+= y - X_{-j}\beta_{-j}.
+\]
+\noindent Then
+\[
+y - X\beta = r_j - x_j \beta_j.
+\]
+
+\noindent Expanding the quadratic term,
+\[
+\|r_j - x_j\beta_j\|^2
+= r_j^\top r_j
+- 2\beta_j x_j^\top r_j
++ \beta_j^2 x_j^\top x_j.
+\]
+
+\noindent Dropping terms not involving $\beta_j$, the log full conditional is
+\[
+\boxed{
+\log f(\beta_j \mid \beta_{-j},\sigma^2,y)
+=
+-\frac{1}{2\sigma^2}
+\left(
+\beta_j^2\, x_j^\top x_j
+- 2\beta_j\, x_j^\top r_j
+\right)
+-\lambda |\beta_j|
++ C.
+}
+\]
+
+\noindent Equivalently, letting
+\[
+A_j = x_j^\top x_j,
+\qquad
+B_j = x_j^\top r_j,
+\]
+\[
+\log f(\beta_j \mid \cdots)
+=
+-\frac{A_j}{2\sigma^2}\beta_j^2
++\frac{B_j}{\sigma^2}\beta_j
+-\lambda|\beta_j|
++ C.
+\]
+
+\medskip
+
+\noindent \textbf{Full conditional of $\sigma^2$.}
+
+\noindent Keeping only the $\sigma^2$ terms,
+\[
+\log f(\sigma^2 \mid \beta,y)
+=
+-\left(\frac{n}{2}+a+1\right)\log(\sigma^2)
+-\frac{1}{\sigma^2}
+\left(
+b + \frac{1}{2}\|y - X\beta\|^2
+\right)
++ C.
+\]
+
+\noindent This is the kernel of an Inverse-Gamma distribution, hence
+\[
+\boxed{
+\sigma^2 \mid \beta,y
+\sim
+\text{Inverse-Gamma}
+\left(
+a+\frac{n}{2},
+\;
+b+\frac{1}{2}\|y - X\beta\|^2
+\right).
+}
+\]
+
+\noindent Part C:
+
+\noindent We update $\beta_j$ using a Gaussian random-walk proposal
+\[
+\beta_j^* = \beta_j + \varepsilon,
+\qquad
+\varepsilon \sim \mathcal{N}(0,s^2).
+\]
+
+\noindent Since this proposal is symmetric,
+\[
+q(\beta_j^* \mid \beta_j) = q(\beta_j \mid \beta_j^*),
+\]
+\noindent the proposal densities cancel in the Metropolis--Hastings ratio.
+
+\noindent Hence the acceptance ratio is
+\[
+r(\beta_j,\beta_j^*)
+=
+\frac{
+f(\beta_j^* \mid \beta_{-j},\sigma^2,y)
+}{
+f(\beta_j \mid \beta_{-j},\sigma^2,y)
+}.
+\]
+
+\noindent Taking logarithms,
+\[
+\log r(\beta_j,\beta_j^*)
+=
+\log f(\beta_j^* \mid \beta_{-j},\sigma^2,y)
+-
+\log f(\beta_j \mid \beta_{-j},\sigma^2,y).
+\]
+
+\noindent From part (b), the log full conditional (up to a constant) is
+\[
+\log f(\beta_j \mid \beta_{-j},\sigma^2,y)
+=
+-\frac{1}{2\sigma^2}
+\|r_j - x_j\beta_j\|^2
+-\lambda |\beta_j|
++ C,
+\]
+\noindent where
+\[
+r_j = y - X_{-j}\beta_{-j}.
+\]
+
+\noindent Therefore,
+\[
+\boxed{
+\log r(\beta_j,\beta_j^*)
+=
+-\frac{1}{2\sigma^2}
+\Big(
+\|r_j - x_j\beta_j^*\|^2
+-
+\|r_j - x_j\beta_j\|^2
+\Big)
+-
+\lambda
+\Big(
+|\beta_j^*| - |\beta_j|
+\Big).
+}
+\]
+
+\noindent The Metropolis update accepts $\beta_j^*$ with probability
+\[
+\alpha
+=
+\min\{1,\exp(\log r(\beta_j,\beta_j^*))\}.
+\]
+
+\noindent Part d:
+
+\noindent Let $T$ be the number of MCMC iterations. Initialize $\beta^{(0)} \in \mathbb{R}^p$ and $(\sigma^2)^{(0)} > 0$. 
+For each coordinate $j$, choose a random-walk step size $s_j>0$.
+
+\medskip
+
+\noindent\textbf{Metropolis-within-Gibbs sampler:}
+\begin{enumerate}
+\item For $t=1,2,\ldots,T$:
+\begin{enumerate}
+\item For $j=1,2,\ldots,p$ (coordinate update for $\beta_j$):
+\begin{enumerate}
+\item Define the partial residual
+\[
+r_j^{(t)} = y - X_{-j}\beta_{-j}^{(t)} ,
+\]
+where $\beta_{-j}^{(t)}$ denotes the current values of all coefficients except $\beta_j$ (using updated values for coordinates $1,\ldots,j-1$ and previous-iteration values for $j+1,\ldots,p$).
+\item Propose
+\[
+\beta_j^* = \beta_j^{(t-1)} + \varepsilon,
+\qquad
+\varepsilon \sim \mathcal{N}(0,s_j^2).
+\]
+\item Compute the log acceptance ratio
+\[
+\log r
+=
+-\frac{1}{2(\sigma^2)^{(t-1)}}
+\Big(
+\|r_j^{(t)} - x_j\beta_j^*\|^2
+-
+\|r_j^{(t)} - x_j\beta_j^{(t-1)}\|^2
+\Big)
+-\lambda\Big(|\beta_j^*|-|\beta_j^{(t-1)}|\Big).
+\]
+\item Set $\alpha=\min\{1,\exp(\log r)\}$. Draw $u\sim \text{Uniform}(0,1)$.
+If $u<\alpha$, accept and set $\beta_j^{(t)}=\beta_j^*$; otherwise reject and set $\beta_j^{(t)}=\beta_j^{(t-1)}$.
+\end{enumerate}
+
+\item Update $\sigma^2$ from its full conditional:
+\[
+(\sigma^2)^{(t)} \sim \text{Inverse-Gamma}\!\left(a+\frac{n}{2},\; b+\frac{1}{2}\|y-X\beta^{(t)}\|^2\right).
+\]
+\end{enumerate}
+\item Store $\beta^{(t)}$ and $(\sigma^2)^{(t)}$.
+\end{enumerate}
+
+\noindent Part E:
+
+\begin{lstlisting}[caption={Metropolis within Gibb's Sampler}]
+install.packages(c("lars", "mcmcse"))  # if needed
+
+# ----- load data -----
+data(diabetes, package = "lars")
+
+# diabetes disease progression after one year
+y <- scale(diabetes$y, center = TRUE, scale = FALSE) |> as.numeric()
+
+# possible explanatory attributes
+x <- scale(diabetes$x, center = TRUE, scale = TRUE)
+n <- nrow(x)
+p <- ncol(x)
+colnames(x) <- colnames(diabetes$x)
+
+######################################################################
+# Bayesian lasso: MH-within-Gibbs skeleton
+#   y | beta, sig2 ~ N(x beta, sig2 I)
+#   beta_j iid ~ Laplace(0, lambda) with f(b) = (lambda/2) exp{-lambda |b|}
+#   sig2 follows Inv-Gamma(a, b) with density ∝ (sig2)^-(a+1) exp{-b/sig2}
+#
+# Gibbs:  sig2 | beta, y is conjugate
+# MH:     beta_j | beta_-j, sig2, y
+######################################################################
+
+set.seed(1)
+
+# ----- hyperparameters -----
+a <- 2
+b <- 2
+lambda <- 1
+
+# ----- MCMC settings -----
+n_iter <- 20000
+burn   <- 2000
+thin   <- 1
+s_beta <- 2.6   # RW step size for beta_j proposals (tune)
+
+# ----- initialize -----
+beta_curr <- rep(0, p)
+sig2_curr <- 1
+
+# ----- full conditional for sig2 -----
+rcond_sig2 <- function(beta, a, b) {
+  mu_hat <- as.numeric(x %*% beta)
+  rss <- sum((y - mu_hat)^2)
+  shape <- a + n / 2
+  rate  <- b + 0.5 * rss
+  1 / rgamma(1, shape = shape, rate = rate)
+}
+
+# ----- FILL IN: proposal + log acceptance ratio for ONE beta_j update -----
+rprop_beta_j <- function(beta_j_curr, s_beta) {
+  # Gaussian random-walk proposal
+  beta_j_curr + rnorm(1, mean = 0, sd = s_beta)
+}
+
+log_r_beta_j <- function(beta_j_new, beta_j_curr, j,
+                         beta_curr, sig2_curr, lambda) {
+  # symmetric RW proposal => log r = log pi(new) - log pi(curr) for beta_j | rest
+  xj <- x[, j]
+  mu_curr <- as.numeric(x %*% beta_curr)
+  res_curr <- y - mu_curr
+  rss_curr <- sum(res_curr^2)
+  
+  delta <- beta_j_new - beta_j_curr
+  res_new <- res_curr - xj * delta
+  rss_new <- sum(res_new^2)
+  
+  # likelihood difference + Laplace prior difference (constants cancel)
+  log_r <- -(rss_new - rss_curr) / (2 * sig2_curr) -
+    lambda * (abs(beta_j_new) - abs(beta_j_curr))
+  
+  log_r
+}
+
+# ----- storage -----
+keep_idx <- which(seq_len(n_iter) > burn & ((seq_len(n_iter) - burn) %% thin == 0))
+n_keep <- length(keep_idx)
+beta_draws <- matrix(NA_real_, n_keep, p)
+sig2_draws <- numeric(n_keep)
+
+# ----- MH-within-Gibbs loop -----
+k <- 0
+acc_beta <- integer(p)  # coordinatewise accept counts
+for (t in 1:n_iter) {
+  
+  # --- update beta one coordinate at a time via MH ---
+  for (j in 1:p) {
+    beta_j_curr <- beta_curr[j]
+    beta_j_new  <- rprop_beta_j(beta_j_curr, s_beta)
+    
+    log_r <- log_r_beta_j(beta_j_new, beta_j_curr, j,
+                          beta_curr, sig2_curr, lambda)
+    
+    if (log(runif(1)) < min(0, log_r)) {
+      beta_curr[j] <- beta_j_new
+      acc_beta[j] <- acc_beta[j] + 1L
+    }
+  }
+  
+  # --- update sig2 via Gibbs ---
+  sig2_curr <- rcond_sig2(beta_curr, a, b)
+  
+  # --- save ---
+  if (t %in% keep_idx) {
+    k <- k + 1
+    beta_draws[k, ] <- beta_curr
+    sig2_draws[k]   <- sig2_curr
+  }
+}
+
+# ----- FILL IN: coordinatewise acceptance rates -----
+acc_rate_beta <- acc_beta / n_iter
+names(acc_rate_beta) <- colnames(x)
+acc_rate_beta
+
+# ----- FILL IN: coordinatewise ess -----
+library(mcmcse)
+ess_beta <- apply(beta_draws, 2, mcmcse::ess)
+names(ess_beta) <- colnames(x)
+ess_sig2 <- mcmcse::ess(sig2_draws)
+ess_beta
+ess_sig2
+
+# ----- FILL IN: estimates -----
+beta_post_mean <- colMeans(beta_draws)
+sig2_post_mean <- mean(sig2_draws)
+
+beta_post_mean
+sig2_post_mean
+\end{lstlisting}
+
+\noindent \textbf{Output:} 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccccccccc}
+\hline
+ & \textbf{Age} & \textbf{Sex} & \textbf{BMI} & \textbf{MAP} & \textbf{TC} & \textbf{LDL} & \textbf{HDL} & \textbf{TCH} & \textbf{LTG} & \textbf{GLU} \\
+\hline
+Acceptance Rate 
+& 0.4180 & 0.5392 & 0.7096 & 0.7037 & 0.4382 
+& 0.4363 & 0.6893 & 0.5288 & 0.7065 & 0.5394 \\
+
+ESS 
+& 2968.18 & 1986.64 & 1275.29 & 1580.95 & 2045.35 
+& 2579.21 & 1608.57 & 1983.19 & 1138.78 & 2135.00 \\
+
+Posterior Mean 
+& 0.2499 & -1.6547 & 23.2438 & 8.6590 & -0.5053 
+& -0.4415 & -4.9045 & 1.5876 & 19.6723 & 1.7049 \\
+\hline
+\end{tabular}
+\caption{MCMC diagnostics and posterior means for all regression coefficients}
+\end{table}
+
+\noindent Part F:
+
+\noindent Based on the table in Part E, BMI, LTG and MAP are associated with increase in mean disease progression (positive coeff.). HDL is associated with disease in mean disease progression (negative coeff.). The rest of the variables have little to no association (close to 0 coeff.)
+
+\smallskip
+
+\noindent Part G:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccccccccc}
+\hline
+ & \textbf{Age} & \textbf{Sex} & \textbf{BMI} & \textbf{MAP} & \textbf{TC} & \textbf{LDL} & \textbf{HDL} & \textbf{TCH} & \textbf{LTG} & \textbf{GLU} \\
+\hline
+Acceptance Rate 
+& 0.2825 & 0.2704 & 0.7232 & 0.6774 & 0.2662 
+& 0.2693 & 0.5291 & 0.4305 & 0.7203 & 0.4052 \\
+
+ESS 
+& 2828.27 & 2728.03 & 1426.01 & 1803.99 & 3135.07 
+& 2869.95 & 2119.10 & 1768.83 & 1104.64 & 2190.37 \\
+
+Posterior Mean 
+& 0.3006 & -0.1834 & 19.2743 & 4.0529 & 0.0827 
+& 0.0693 & -2.0003 & 1.2974 & 15.4730 & 1.1556 \\
+\hline
+\end{tabular}
+\caption{MCMC diagnostics and posterior means for all regression coefficients ($\lambda$ = 2)}
+\end{table}
+
+\noindent We see that the values for the variables coefficient's change, however relative to one another they exhibit the same result as we saw in Part F.
+
+
+\end{document}
